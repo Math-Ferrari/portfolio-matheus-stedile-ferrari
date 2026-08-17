@@ -1,0 +1,277 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Design tokens
+
+   Identidade: bege quente como base, azul vivo como cor de ação e destaque,
+   navy profundo nas faixas de contraste. Branco apenas como superfície.
+   Sem gradientes, sem glow — profundidade vem de blocos geométricos sólidos.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Fundos */
+  --color-paper: #f3efe7;
+  --color-paper-deep: #eae4d8;
+  --color-surface: #ffffff;
+  --color-surface-soft: #faf8f3;
+
+  /* Navy — faixas de contraste */
+  --color-navy: #0b1a33;
+  --color-navy-deep: #071224;
+  --color-navy-soft: #14294b;
+  --color-line-navy: #1e3357;
+  --color-on-navy: #e8edf6;
+  --color-on-navy-muted: #9daec9;
+
+  /* Texto sobre bege/branco */
+  --color-ink: #101e36;
+  --color-ink-muted: #4b586e;
+  --color-ink-subtle: #5e6a82;
+
+  /* Filetes */
+  --color-line: #ded7c9;
+  --color-line-strong: #c6bdaa;
+
+  /* Azul */
+  --color-blue: #0b4fe0;
+  --color-blue-deep: #0838a8;
+  --color-blue-light: #5b8cff;
+  --color-blue-soft: #e3eafc;
+
+  /* Tipografia */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, "Times New Roman", serif;
+
+  --text-display: clamp(2.5rem, 1.45rem + 3.6vw, 4.35rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.03em;
+
+  --text-statement: clamp(1.65rem, 1.15rem + 1.7vw, 2.45rem);
+  --text-statement--line-height: 1.15;
+  --text-statement--letter-spacing: -0.025em;
+
+  --text-title: clamp(1.75rem, 1.25rem + 1.7vw, 2.5rem);
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.03em;
+
+  --text-heading: clamp(1.35rem, 1.1rem + 0.9vw, 1.7rem);
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.02em;
+
+  --text-lead: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+
+  /* Ritmo vertical */
+  --spacing-section: clamp(4.5rem, 3rem + 5.5vw, 8rem);
+  --spacing-gutter: clamp(1.25rem, 0.6rem + 2.4vw, 4rem);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Base
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :where(section, article)[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Sobre navy o azul padrão não tem contraste suficiente para o foco. */
+  .on-navy :focus-visible {
+    outline-color: var(--color-blue-light);
+  }
+
+  ::selection {
+    background-color: var(--color-blue);
+    color: #ffffff;
+  }
+
+  /* A Lenis marca o <html> com esta classe assim que monta — evita suavizar
+     o mesmo scroll duas vezes (CSS nativo + RAF da lib). */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Utilitários
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@utility text-balance-title {
+  text-wrap: balance;
+}
+
+@utility nums-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sublinhado que cresce da esquerda — usado nos links do header. */
+@utility link-underline {
+  position: relative;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Movimento
+
+   Duas peças apenas: entrada do hero (CSS puro, com stagger curto) e
+   `.reveal`, acionado por IntersectionObserver em grupos — nunca por texto.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.rise-1 {
+  animation-delay: 0.04s;
+}
+.rise-2 {
+  animation-delay: 0.11s;
+}
+.rise-3 {
+  animation-delay: 0.18s;
+}
+.rise-4 {
+  animation-delay: 0.26s;
+}
+
+/* Título de abertura: máscara que revela o texto da esquerda para a direita,
+   combinada com o mesmo translateY+opacity do .rise. Usada só em títulos que
+   abrem uma página (hero, topo do case) — não é digitação, é um wipe único. */
+@keyframes reveal-title {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    clip-path: inset(0 0% 0 0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-title {
+  animation: reveal-title 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Elemento visual do hero: chega de forma independente do texto, com uma
+   escala sutil além do translateY. */
+@keyframes rise-visual {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rise-visual {
+  animation: rise-visual 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: 0.32s;
+}
+
+/* Faixa de capacidades em loop. Duplicar o conteúdo no componente e animar
+   -50% cria um loop contínuo sem salto. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 34s linear infinite;
+}
+
+.marquee-track:hover,
+.marquee-track:focus-within {
+  animation-play-state: paused;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-x {
+  transform: translateX(1.5rem);
+}
+
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* Sem JavaScript o conteúdo não pode ficar invisível — ver <noscript> no layout. */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .rise,
+  .reveal,
+  .reveal-title,
+  .rise-visual {
+    animation: none;
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+    transition: none;
+  }
+
+  /* Sem isso a regra global de duração 0.01ms deixaria o loop infinito
+     "piscando" em vez de simplesmente parado. */
+  .marquee-track {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
