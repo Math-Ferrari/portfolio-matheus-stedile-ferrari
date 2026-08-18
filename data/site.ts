@@ -98,9 +98,17 @@ export const activeContacts = contacts.filter((contact) => contact.href.length >
 /** Contato usado no botão principal da seção de contato. */
 export const primaryContact = activeContacts[0];
 
+/**
+ * Linhas do título do hero. `hero.title` é derivado daqui, então a versão em
+ * uma linha (usada no <title>, na imagem OG e no hero estável) e a composição
+ * em três linhas do hero experimental nunca podem divergir.
+ */
+const heroLines = ["Transformo", "problemas de negócio", "em software."] as const;
+
 export const hero = {
   eyebrow: `${site.name} — ${site.role}`,
-  title: "Transformo problemas de negócio em software.",
+  lines: heroLines,
+  title: heroLines.join(" "),
   /** Trecho do título destacado em azul. Precisa aparecer dentro de `title`. */
   highlight: "software",
   lead: "Desenvolvo sistemas internos, aplicações web e integrações para organizar operações, reduzir trabalho manual e deixar a informação acessível para quem precisa decidir.",
