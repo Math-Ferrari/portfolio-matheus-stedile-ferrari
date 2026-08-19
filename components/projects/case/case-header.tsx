@@ -19,11 +19,11 @@ export function CaseHeader({ project }: CaseHeaderProps) {
   );
 
   return (
-    <header className="bg-paper">
+    <header className="bg-tone-slate">
       <Container className="pb-14 pt-8 md:pt-12">
         <Link
           href="/projetos"
-          className="group inline-flex items-center gap-2 text-sm text-ink-muted transition-colors duration-200 hover:text-blue"
+          className="group inline-flex items-center gap-2 text-sm text-muted transition-colors duration-200 hover:text-accent-blue"
         >
           <ArrowLeft
             aria-hidden
@@ -35,18 +35,18 @@ export function CaseHeader({ project }: CaseHeaderProps) {
 
         <div className="mt-10 grid items-center gap-x-12 gap-y-12 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <p className="rise rise-1 flex items-center gap-3 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-ink-subtle">
-              <span aria-hidden className="h-px w-6 bg-blue" />
+            <p className="rise rise-1 flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
+              <span aria-hidden className="h-px w-6 bg-accent-blue" />
               {project.kind} — {project.role}
             </p>
 
-            <h1 className="reveal-title rise-2 text-balance-title mt-7 max-w-[20ch] font-serif text-title font-medium text-ink">
+            <h1 className="reveal-title rise-2 text-balance-title mt-7 max-w-[20ch] text-heading-xl font-medium text-foreground">
               {project.name}
             </h1>
 
-            <p className="rise rise-3 mt-6 max-w-[44ch] text-lead text-ink">
+            <p className="rise rise-3 mt-6 max-w-[44ch] text-body-lg text-foreground">
               {before}
-              {match ? <span className="text-blue">{match}</span> : null}
+              {match ? <span className="text-accent-blue">{match}</span> : null}
               {after}
             </p>
 
@@ -73,8 +73,8 @@ export function CaseHeader({ project }: CaseHeaderProps) {
 
         {project.case ? (
           <Reveal className="mt-16 grid gap-x-10 lg:grid-cols-12">
-            <div className="border-t border-line pt-8 lg:col-span-8 lg:col-start-4">
-              <div className="max-w-[62ch] space-y-5 text-lead text-ink-muted">
+            <div className="border-t border-border pt-8 lg:col-span-8 lg:col-start-4">
+              <div className="max-w-[62ch] space-y-5 text-body-lg text-muted">
                 {project.case.intro.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}

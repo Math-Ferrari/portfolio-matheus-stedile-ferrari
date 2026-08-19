@@ -15,8 +15,9 @@ type FeaturedProjectProps = {
 };
 
 /**
- * Faixa navy de largura total com o case principal. É o único bloco escuro do
- * meio da página — a chamada vem antes do nome do projeto.
+ * Faixa de largura total com o case principal, em `bg-tone-slate` — o mesmo
+ * papel usado por `PlatoTruckShowcase` na home, para o case principal ler
+ * como a mesma "cena" em qualquer página.
  */
 export function FeaturedProject({ project, as: Heading = "h3" }: FeaturedProjectProps) {
   const href = `/projetos/${project.slug}`;
@@ -26,53 +27,43 @@ export function FeaturedProject({ project, as: Heading = "h3" }: FeaturedProject
   );
 
   return (
-    <div className="on-navy bg-navy">
+    <div className="bg-tone-slate">
       <Container className="py-16 md:py-20 lg:py-24">
         <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12 lg:items-center">
           <Reveal className="lg:col-span-5">
-            <Eyebrow tone="navy">Case principal</Eyebrow>
+            <Eyebrow>Case principal</Eyebrow>
 
-            <Heading className="text-balance-title mt-7 font-serif text-statement font-medium text-on-navy">
-              <Link
-                href={href}
-                className="transition-colors duration-200 hover:text-blue-light"
-              >
+            <Heading className="text-balance-title mt-7 text-heading-xl font-medium text-foreground">
+              <Link href={href} className="transition-colors duration-200 hover:text-accent-blue-light">
                 {before}
-                {match ? <span className="text-blue-light">{match}</span> : null}
+                {match ? <span className="text-accent-blue-light">{match}</span> : null}
                 {after}
               </Link>
             </Heading>
 
-            <p className="mt-6 text-[0.76rem] font-medium uppercase tracking-[0.16em] text-blue-light">
+            <p className="mt-6 text-caption font-medium uppercase tracking-[0.16em] text-accent-blue-light">
               {project.name} — {project.kind}
             </p>
 
-            <p className="mt-6 max-w-[46ch] text-on-navy-muted">{project.summary}</p>
+            <p className="mt-6 max-w-[46ch] text-muted">{project.summary}</p>
 
             <ul className="mt-10 grid gap-x-8 sm:grid-cols-2">
               {project.highlights.map((highlight) => (
-                <li
-                  key={highlight}
-                  className="border-t border-line-navy py-3 text-sm text-on-navy"
-                >
+                <li key={highlight} className="border-t border-border py-3 text-sm text-foreground">
                   {highlight}
                 </li>
               ))}
             </ul>
 
             <div className="mt-10">
-              <ActionLink href={href} variant="primaryDark">
+              <ActionLink href={href} variant="quiet" className="text-lg">
                 Ver case completo
               </ActionLink>
             </div>
           </Reveal>
 
           <Reveal delay={110} from="right" className="lg:col-span-7">
-            <FramedVisual
-              screenshot={project.cover}
-              tone="dark"
-              sizes="(min-width: 1024px) 54vw, 100vw"
-            />
+            <FramedVisual screenshot={project.cover} sizes="(min-width: 1024px) 54vw, 100vw" />
           </Reveal>
         </div>
       </Container>

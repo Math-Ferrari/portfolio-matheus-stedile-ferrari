@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 
+import type { Tone } from "@/components/ui/tone";
 import type { Screenshot } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -9,27 +10,27 @@ const frameAspect = {
   mobile: "aspect-[9/17]",
 } as const;
 
-/** Sobre navy o placeholder precisa de outra borda e outro texto. */
-const surfaceTone = {
-  light: {
-    frame: "border-line bg-surface-soft",
-    icon: "text-ink-subtle",
-    label: "text-ink-subtle",
-    text: "text-ink-muted",
-  },
-  dark: {
-    frame: "border-line-navy bg-navy-deep",
-    icon: "text-on-navy-muted",
-    label: "text-on-navy-muted",
-    text: "text-on-navy-muted",
-  },
-} as const;
+/**
+ * A moldura usa os mesmos seis tons de `components/ui/tone.ts` — quem chama
+ * escolhe a cena (ex.: alternar `elevated`/`slate` entre screenshots
+ * consecutivas de um case, para dar ritmo sem depender de fundo de seção).
+ * Texto/ícone do placeholder são sempre `text-muted`: os seis fundos ficam
+ * próximos o bastante em luminosidade para não precisarem de um par próprio.
+ */
+const frameByTone: Record<Tone, string> = {
+  base: "border-border bg-background",
+  graphite: "border-border bg-tone-graphite",
+  navy: "border-border bg-tone-navy",
+  slate: "border-border bg-tone-slate",
+  petrol: "border-border bg-tone-petrol",
+  elevated: "border-border bg-surface-elevated",
+};
 
 type FrameProps = {
   screenshot: Screenshot;
   priority?: boolean;
   sizes?: string;
-  tone?: keyof typeof surfaceTone;
+  tone?: Tone;
   /** Sem borda e sem cantos próprios — para preencher a área de um card. */
   bare?: boolean;
   className?: string;
@@ -43,19 +44,18 @@ export function ScreenshotFrame({
   screenshot,
   priority = false,
   sizes = "(min-width: 1024px) 60vw, 100vw",
-  tone = "light",
+  tone = "elevated",
   bare = false,
   className,
 }: FrameProps) {
   const frame = screenshot.frame ?? "desktop";
-  const style = surfaceTone[tone];
 
   return (
     <div
       className={cn(
         "relative w-full overflow-hidden",
         bare ? "rounded-none" : "rounded-md border",
-        style.frame,
+        frameByTone[tone],
         frameAspect[frame],
         className,
       )}
@@ -71,16 +71,11 @@ export function ScreenshotFrame({
         />
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-          <ImageIcon aria-hidden className={cn("size-5", style.icon)} strokeWidth={1.5} />
-          <p
-            className={cn(
-              "text-[0.68rem] font-medium uppercase tracking-[0.2em]",
-              style.label,
-            )}
-          >
+          <ImageIcon aria-hidden className="size-5 text-muted" strokeWidth={1.5} />
+          <p className="text-caption font-medium uppercase tracking-[0.2em] text-muted">
             Placeholder de desenvolvimento
           </p>
-          <p className={cn("max-w-[36ch] text-sm", style.text)}>{screenshot.alt}</p>
+          <p className="max-w-[36ch] text-sm text-muted">{screenshot.alt}</p>
         </div>
       )}
     </div>
@@ -94,7 +89,7 @@ export function ScreenshotFigure({
   screenshot,
   priority,
   sizes,
-  tone = "light",
+  tone = "elevated",
   className,
 }: FigureProps) {
   return (
@@ -106,14 +101,7 @@ export function ScreenshotFigure({
         tone={tone}
       />
       {screenshot.caption ? (
-        <figcaption
-          className={cn(
-            "mt-4 border-t pt-3 text-sm",
-            tone === "dark"
-              ? "border-line-navy text-on-navy-muted"
-              : "border-line text-ink-muted",
-          )}
-        >
+        <figcaption className="mt-4 border-t border-border pt-3 text-sm text-muted">
           {screenshot.caption}
         </figcaption>
       ) : null}
@@ -124,11 +112,11 @@ export function ScreenshotFigure({
 type GroupProps = {
   layout: "single" | "pair" | "device";
   items: Screenshot[];
-  tone?: keyof typeof surfaceTone;
+  tone?: Tone;
 };
 
 /** Composições de screenshots: uma grande, duas lado a lado, ou desktop + mobile. */
-export function ScreenshotGroup({ layout, items, tone = "light" }: GroupProps) {
+export function ScreenshotGroup({ layout, items, tone = "elevated" }: GroupProps) {
   if (layout === "device") {
     const desktop = items.find((item) => item.frame !== "mobile");
     const mobile = items.find((item) => item.frame === "mobile");

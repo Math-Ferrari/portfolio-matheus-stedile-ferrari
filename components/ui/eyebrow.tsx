@@ -10,13 +10,13 @@ type EyebrowProps = {
 };
 
 /** Rótulo pequeno em caixa alta, com um traço azul, no topo de cada seção. */
-export function Eyebrow({ children, index, tone = "paper", className }: EyebrowProps) {
+export function Eyebrow({ children, index, tone = "base", className }: EyebrowProps) {
   const style = tones[tone];
 
   return (
     <p
       className={cn(
-        "flex items-center gap-3 text-[0.72rem] font-medium uppercase tracking-[0.18em]",
+        "flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em]",
         style.label,
         className,
       )}
@@ -26,13 +26,7 @@ export function Eyebrow({ children, index, tone = "paper", className }: EyebrowP
           {index}
         </span>
       ) : (
-        <span
-          aria-hidden
-          className={cn(
-            "h-px w-6",
-            tone === "navy" ? "bg-blue-light" : "bg-blue",
-          )}
-        />
+        <span aria-hidden className="h-px w-6 bg-accent-blue" />
       )}
       <span>{children}</span>
     </p>

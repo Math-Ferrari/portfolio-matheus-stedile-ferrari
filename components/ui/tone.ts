@@ -1,10 +1,17 @@
 /**
- * Tons de seção.
+ * Tons de seção — cada um é uma "cena" da mesma identidade dark/light, não
+ * uma paleta própria. Seis papéis, cada um com par escuro/claro definido em
+ * `app/globals.css` (`--tone-*`, `--surface-elevated`): `base` é a cor da
+ * capa (quase preto / off-white); `graphite`/`navy`/`slate`/`petrol` são
+ * variações sutis de matiz para seções abaixo dela nunca empilharem o mesmo
+ * fundo repetido; `elevated` é a superfície mais alta do tema, para o fecho
+ * de página e cards que precisam se destacar de qualquer cena.
  *
- * A página é majoritariamente bege. `surface` e `deep` quebram o ritmo de forma
- * discreta; `navy` é a faixa de contraste e aparece poucas vezes no site.
+ * Nenhum dos seis fixa cor de texto própria: dentro de um mesmo tema, os
+ * tons ficam próximos o bastante para o mesmo par `foreground`/`muted`
+ * servir a todos — a diferença é só o fundo.
  */
-export type Tone = "paper" | "surface" | "deep" | "navy";
+export type Tone = "base" | "graphite" | "navy" | "slate" | "petrol" | "elevated";
 
 type ToneStyles = {
   section: string;
@@ -17,45 +24,21 @@ type ToneStyles = {
   body: string;
 };
 
+const shared = {
+  border: "border-border",
+  title: "text-foreground",
+  lead: "text-muted",
+  label: "text-muted",
+  index: "text-accent-blue",
+  line: "border-border",
+  body: "text-muted",
+} as const;
+
 export const tones: Record<Tone, ToneStyles> = {
-  paper: {
-    section: "bg-paper",
-    border: "border-line",
-    title: "text-ink",
-    lead: "text-ink-muted",
-    label: "text-ink-subtle",
-    index: "text-blue",
-    line: "border-line",
-    body: "text-ink-muted",
-  },
-  surface: {
-    section: "bg-surface",
-    border: "border-line",
-    title: "text-ink",
-    lead: "text-ink-muted",
-    label: "text-ink-subtle",
-    index: "text-blue",
-    line: "border-line",
-    body: "text-ink-muted",
-  },
-  deep: {
-    section: "bg-paper-deep",
-    border: "border-line-strong",
-    title: "text-ink",
-    lead: "text-ink-muted",
-    label: "text-ink-subtle",
-    index: "text-blue",
-    line: "border-line-strong",
-    body: "text-ink-muted",
-  },
-  navy: {
-    section: "on-navy bg-navy",
-    border: "border-line-navy",
-    title: "text-on-navy",
-    lead: "text-on-navy-muted",
-    label: "text-on-navy-muted",
-    index: "text-blue-light",
-    line: "border-line-navy",
-    body: "text-on-navy-muted",
-  },
+  base: { ...shared, section: "bg-background" },
+  graphite: { ...shared, section: "bg-tone-graphite" },
+  navy: { ...shared, section: "bg-tone-navy" },
+  slate: { ...shared, section: "bg-tone-slate" },
+  petrol: { ...shared, section: "bg-tone-petrol" },
+  elevated: { ...shared, section: "bg-surface-elevated" },
 };

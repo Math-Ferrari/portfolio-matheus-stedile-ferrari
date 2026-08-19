@@ -4,9 +4,21 @@ import { Inter, Source_Serif_4 } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { activeContacts, site } from "@/data/site";
 
 import "./globals.css";
+
+/**
+ * Roda antes de qualquer coisa do React, direto no `<head>`, como texto puro
+ * (nunca uma função serializada) — assim funciona também com CSP que bloqueia
+ * `unsafe-eval`. Decide o tema e já escreve `data-theme` em `<html>` no
+ * primeiro paint: sem isso, a página nasceria no tema padrão do CSS e só
+ * corrigiria depois que o React montasse — o "pisca" que a tarefa pede para
+ * evitar. `ThemeProvider` (client) só sincroniza o estado do React com o que
+ * este script já deixou pronto; não decide o tema de novo.
+ */
+const themeInitScript = `(function(){try{var s=localStorage.getItem("theme");var t=s==="light"||s==="dark"?s:(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,8 +64,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f3efe7",
-  colorScheme: "light",
+  /* Um valor por esquema — o navegador escolhe pela preferência do SISTEMA
+     operacional, via media query nativa. Isso cobre a barra de UI (endereço
+     no mobile, etc.) antes mesmo do JS rodar; não tenta acompanhar a troca
+     manual em runtime, que exigiria reescrever a tag a cada clique — o tipo
+     de complicação que a tarefa pediu para evitar se não for essencial. */
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f2ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#050505" },
+  ],
+  colorScheme: "light dark",
 };
 
 /**
@@ -91,8 +111,18 @@ const personJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${sourceSerif.variable}`}>
-      <body className="min-h-dvh antialiased">
+    <html
+      lang="pt-BR"
+      className={`${inter.variable} ${sourceSerif.variable}`}
+      /* O script no <head> escreve `data-theme` antes do React montar — sem
+         isto o React reclamaria de um `<html>` que "mudou" entre o HTML do
+         servidor e o que ele encontrou no primeiro render no cliente. */
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="min-h-dvh bg-background text-foreground antialiased">
         {/* Sem JavaScript não há IntersectionObserver: o conteúdo entra já visível. */}
         <noscript>
           <style>{`.reveal{opacity:1;transform:none}`}</style>
@@ -100,16 +130,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <a
           href="#conteudo"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-blue focus:px-5 focus:py-2 focus:text-sm focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent-blue focus:px-5 focus:py-2 focus:text-sm focus:text-white"
         >
           Pular para o conteúdo
         </a>
 
-        <SmoothScroll>
-          <SiteHeader />
-          <main id="conteudo">{children}</main>
-          <SiteFooter />
-        </SmoothScroll>
+        <ThemeProvider>
+          <SmoothScroll>
+            <SiteHeader />
+            <main id="conteudo">{children}</main>
+            <SiteFooter />
+          </SmoothScroll>
+        </ThemeProvider>
 
         <script
           type="application/ld+json"

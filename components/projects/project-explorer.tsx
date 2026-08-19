@@ -33,40 +33,34 @@ export function ProjectExplorer({ projects }: ProjectExplorerProps) {
   return (
     <div className="grid gap-12 lg:grid-cols-12 lg:gap-x-12">
       <div className="lg:col-span-5">
-        <ul className="border-t border-line">
+        <ul className="border-t border-border">
           {projects.map((project, index) => (
-            <li key={project.slug} className="border-b border-line">
+            <li key={project.slug} className="border-b border-border">
               <Link
                 href={`/projetos/${project.slug}`}
                 onMouseEnter={() => setActive(index)}
                 onFocus={() => setActive(index)}
                 className={cn(
                   "group flex items-baseline justify-between gap-6 py-6 transition-colors duration-200",
-                  index === active ? "text-blue" : "text-ink hover:text-blue",
+                  index === active ? "text-accent-blue" : "text-foreground hover:text-accent-blue",
                 )}
               >
                 <span className="flex items-baseline gap-5">
-                  <span className="nums-tabular text-xs text-ink-subtle">
-                    {toIndexLabel(index)}
-                  </span>
-                  <span className="text-[1.35rem] font-medium -tracking-[0.02em] md:text-[1.55rem]">
+                  <span className="nums-tabular text-xs text-muted">{toIndexLabel(index)}</span>
+                  <span className="text-heading-lg font-medium -tracking-[0.02em]">
                     {project.name}
                   </span>
                 </span>
                 <ArrowUpRight
                   aria-hidden
-                  className="size-5 shrink-0 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+                  className="size-5 shrink-0 text-accent-red opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
                   strokeWidth={1.75}
                 />
               </Link>
 
               <div className="pb-7 lg:hidden">
-                <ScreenshotFrame
-                  screenshot={project.cover}
-                  sizes="100vw"
-                  className="border-line-strong"
-                />
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">{project.tagline}</p>
+                <ScreenshotFrame screenshot={project.cover} sizes="100vw" />
+                <p className="mt-3 text-sm leading-relaxed text-muted">{project.tagline}</p>
               </div>
             </li>
           ))}
@@ -93,8 +87,8 @@ export function ProjectExplorer({ projects }: ProjectExplorerProps) {
             ))}
           </div>
 
-          <p className="mt-6 text-[1.1rem] font-medium text-ink">{activeProject.tagline}</p>
-          <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-ink-muted">
+          <p className="mt-6 text-body-lg font-medium text-foreground">{activeProject.tagline}</p>
+          <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-muted">
             {activeProject.summary}
           </p>
         </div>

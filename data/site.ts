@@ -1,4 +1,4 @@
-import type { Capability, ContactLink, LinkItem, Screenshot, TechGroup } from "@/lib/types";
+import type { ContactLink, LinkItem, Screenshot, TechGroup } from "@/lib/types";
 
 /**
  * ────────────────────────────────────────────────────────────────────────────
@@ -58,9 +58,8 @@ export const site = {
 
 export const nav: LinkItem[] = [
   { label: "Projetos", href: "/#projetos" },
-  { label: "O que faço", href: "/#o-que-faco" },
-  { label: "Sobre", href: "/#sobre" },
-  { label: "Tecnologias", href: "/#tecnologias" },
+  { label: "Como trabalho", href: "/#como-trabalho" },
+  { label: "Stack", href: "/#stack" },
   { label: "Contato", href: "/#contato" },
 ];
 
@@ -119,8 +118,32 @@ export const hero = {
 } as const;
 
 /**
+ * Teasers da primeira dobra: dois projetos como elementos de navegação, não
+ * como cards completos. A copy aqui é curta de propósito e independe da de
+ * `data/projects.ts` — o card do hero mostra menos que o card da seção de
+ * projetos, e `slug` é o que liga os dois.
+ */
+export const heroProjects = [
+  {
+    slug: "sistema-platotruck",
+    label: "Sistema interno",
+    name: "Sistema de Gestão PlatoTruck",
+    teaser: "Operação multiempresa e gestão de estoque.",
+  },
+  {
+    slug: "tudoprabarco",
+    label: "Plataforma web",
+    name: "tudoPrabarco",
+    teaser: "Marketplace digital do setor náutico.",
+  },
+] as const;
+
+/**
  * Imagem da primeira dobra. Assim que houver uma screenshot real de um dos
  * sistemas, preencha `src` — o placeholder some sozinho.
+ *
+ * NOTA: o hero atual (capa dark com Aurora) não consome mais este objeto. Ele
+ * continua aqui porque `components/sections/hero.tsx` (hero estável) o usa.
  */
 export const heroVisual: Screenshot = {
   src: "", // TODO: "/screenshots/platotruck/dashboard.png"
@@ -129,65 +152,50 @@ export const heroVisual: Screenshot = {
   frame: "desktop",
 };
 
-export const approach = {
-  eyebrow: "Abordagem",
-  title: "Software começa pelo problema.",
-  paragraphs: [
-    "Antes de escrever funcionalidades, procuro entender como a operação funciona hoje: quem executa cada etapa, quais regras existem de fato, onde a informação se perde e o que já é resolvido fora do sistema.",
-    "Isso costuma mudar o que precisa ser construído. Muita coisa que parece faltar é, na verdade, uma regra de negócio que ninguém tinha escrito — e boa parte do trabalho é transformar essas regras em algo que o software consiga garantir.",
-  ],
-  steps: [
-    {
-      title: "Entender a operação",
-      description:
-        "Como o processo acontece hoje, quais são as exceções e o que depende de controle manual.",
-    },
-    {
-      title: "Definir o que resolve",
-      description:
-        "Recortar o problema em algo construível, com prioridade no que trava o dia a dia.",
-    },
-    {
-      title: "Construir e ajustar",
-      description:
-        "Entregar em partes utilizáveis e corrigir a rota com base no uso real, não em suposição.",
-    },
-  ],
+/**
+ * Apresentação — a ÚNICA vez que o posicionamento é declarado no corpo da
+ * home (a hero já mostra "Engenheiro de Software · Desenvolvimento Full
+ * Stack" na capa; repetir o cargo aqui embaixo seria a mesma frase duas
+ * vezes). Esta seção assume que o cargo já foi lido e fala do que constrói.
+ * A antiga seção "Sobre" (quatro parágrafos, mais abaixo) foi removida por
+ * dizer o mesmo com outras palavras — o que ela tinha de próprio (graduação)
+ * está em `about`, que continua exportado para uma futura página /sobre.
+ */
+export const profile = {
+  heading: "Software para operações reais.",
+  lead: "Desenvolvo sistemas de ponta a ponta, do entendimento da regra de negócio à interface usada no dia a dia.",
+  detail: "Sistemas internos, aplicações web, integrações, dados e regras de negócio.",
 } as const;
 
-/** Faixa em movimento entre a seção de projetos e "Como trabalho". */
-export const marqueeItems = [
-  "Sistemas internos",
-  "Aplicações web",
-  "Integrações",
-  "Automações",
-  "Dashboards",
-  "APIs",
-  "Sistemas multiempresa",
-] as const;
-
-export const capabilities: Capability[] = [
-  {
-    title: "Sistemas internos",
-    description:
-      "Ferramentas construídas de acordo com os processos e as regras específicas de uma empresa, no lugar de adaptar a operação a um software genérico.",
-  },
-  {
-    title: "Aplicações web",
-    description:
-      "Plataformas, marketplaces, portais e sistemas web — do cadastro e das permissões até as telas que sustentam o uso diário.",
-  },
-  {
-    title: "Integrações e automações",
-    description:
-      "Conexão entre sistemas e APIs, troca de dados entre serviços e redução de tarefas repetidas manualmente.",
-  },
-  {
-    title: "Dados e dashboards",
-    description:
-      "Organização das informações que a operação já produz e indicadores para acompanhar o que está acontecendo.",
-  },
-];
+/**
+ * "Como trabalho" — fusão de `approach` (como penso) e `capabilities` (o que
+ * construo) numa seção só. As descrições foram encurtadas para uma linha:
+ * na home o objetivo é sinalizar o método, não documentá-lo.
+ */
+export const howIWork = {
+  title: "Do problema ao software.",
+  lead: "Muita coisa que parece faltar é, na verdade, uma regra de negócio que ninguém tinha escrito. Boa parte do trabalho é transformar essas regras em algo que o software garanta.",
+  thinking: [
+    {
+      title: "Entender",
+      description: "Como a operação funciona hoje, quais são as exceções e onde existe atrito.",
+    },
+    {
+      title: "Definir",
+      description: "Recortar o problema em algo construível, priorizando o que trava o dia a dia.",
+    },
+    {
+      title: "Construir",
+      description: "Entregar em partes utilizáveis e ajustar com base no uso real.",
+    },
+  ],
+  building: [
+    { title: "Sistemas internos", description: "Ferramentas feitas para os processos de uma empresa específica." },
+    { title: "Aplicações web", description: "Plataformas e portais, do cadastro às telas de uso diário." },
+    { title: "Integrações e automações", description: "Conexão entre sistemas e APIs, menos trabalho repetido." },
+    { title: "Dados e dashboards", description: "Organizar o que a operação já produz e torná-lo consultável." },
+  ],
+} as const;
 
 export const about = {
   eyebrow: "Sobre",
@@ -212,28 +220,26 @@ export const techGroups: TechGroup[] = [
   { label: "Cloud e ferramentas", items: ["AWS", "Vercel", "Git / GitHub"] },
 ];
 
+/**
+ * Engenharia na home: só a sinalização de que o assunto é tratado — a lista
+ * é de princípios, sem um parágrafo explicando cada conceito. O "como foi
+ * implementado" mora nos cases (ver o bloco `seguranca` em
+ * `data/projects.ts`), não aqui.
+ */
 export const engineering = {
-  eyebrow: "Engenharia",
-  title: "Segurança tratada como parte do desenvolvimento.",
-  paragraphs: [
-    "Sistemas internos lidam com dados de operação, estoque e pessoas. Por isso trato controle de acesso e validação como parte do que está sendo construído, e não como um ajuste posterior.",
-    "Nem todo projeto exige o mesmo conjunto de controles, e nem todos os itens abaixo estão presentes em todos os projetos. É a forma como avalio o assunto e o que considero ao desenvolver.",
-  ],
-  concerns: [
-    { title: "Autenticação", description: "Identificação de quem está usando o sistema." },
-    { title: "Autorização", description: "Perfis e níveis de acesso por funcionalidade." },
-    { title: "Validação", description: "Verificação dos dados de entrada antes de persistir." },
-    { title: "Regras no servidor", description: "Decisões críticas fora do controle do cliente." },
-    { title: "Controle de acesso", description: "Escopo do que cada usuário enxerga e altera." },
-    { title: "Políticas no banco", description: "Restrições na camada de dados, não só na aplicação." },
-    { title: "Auditoria", description: "Registro do que foi feito, por quem e quando." },
-    { title: "Segurança por camadas", description: "Frontend, backend e banco com responsabilidades próprias." },
+  title: "Segurança como parte do desenvolvimento, não como ajuste posterior.",
+  lead: "Nem todo projeto exige o mesmo conjunto de controles. É o que avalio ao construir.",
+  principles: [
+    "Autenticação e autorização",
+    "Regras no servidor",
+    "Validação de entrada",
+    "Controle de acesso",
+    "Políticas no banco",
+    "Auditoria",
   ],
 } as const;
 
 export const contact = {
-  eyebrow: "Contato",
-  title: "Tem um problema que pode ser resolvido com software?",
-  subtitle: "Vamos conversar.",
-  lead: "Me conte o que está travando a operação hoje — respondo com o que dá para fazer e como eu abordaria.",
+  title: "Tem algo que vale a pena construir?",
+  cta: "Vamos conversar",
 } as const;

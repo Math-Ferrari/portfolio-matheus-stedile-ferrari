@@ -1,4 +1,4 @@
-import type { CaseBlock, Project } from "@/lib/types";
+import type { CaseBlock, Project, Screenshot } from "@/lib/types";
 
 /**
  * ────────────────────────────────────────────────────────────────────────────
@@ -37,6 +37,10 @@ export const projects: Project[] = [
       "Permissões e níveis de acesso",
       "Dashboards e área comercial",
     ],
+    /* Cada palavra vem de um grupo real em `case.blocks` (id "funcionalidades"):
+       Multiempresa e Estoque são labels de grupo; Inventário e Scanner são
+       itens dentro deles; Permissões vem do grupo "Acesso e usuários". */
+    tags: ["Multiempresa", "Estoque", "Inventário", "Scanner", "Permissões"],
     tech: [],
     links: [],
     cover: {
@@ -579,6 +583,150 @@ export function getNextProject(slug: string): Project {
   return next as Project;
 }
 
+/**
+ * Copy curta de "Projetos selecionados" na home — independente da copy do
+ * case completo (mesmo raciocínio de `heroProjects`): um texto próprio para
+ * "bater o olho", com `slug` ligando ao projeto real em `projects`. As
+ * palavras-chave vêm de funcionalidades já documentadas no case de cada
+ * projeto — nenhuma nova aqui.
+ *
+ * A ORDEM deste array é a hierarquia visual da seção, do maior peso para o
+ * menor: PlatoTruck (largura inteira) → PlatoTruck.com (7/12) →
+ * tudoPrabarco (5/12). `span` é o que o componente lê para montar o grid.
+ */
+export const selectedProjects = [
+  {
+    slug: "sistema-platotruck",
+    category: "Sistema interno",
+    span: "full",
+    description:
+      "Sistema interno multiempresa desenvolvido para centralizar operações de estoque, usuários e processos internos.",
+    keywords: [
+      "Multiempresa",
+      "Inventário",
+      "Usuários e permissões",
+      "Scanner",
+      "Segurança",
+      "Movimentações",
+      "Gestão de estoque",
+      "Dashboards",
+    ],
+  },
+  {
+    slug: "platotruck-site",
+    category: "Site institucional",
+    span: "wide",
+    description:
+      "Site institucional desenvolvido para apresentar a PlatoTruck, seus produtos e sua atuação.",
+    keywords: [
+      "Desenvolvimento web",
+      "Interface responsiva",
+      "Apresentação institucional",
+      "Produtos e conteúdo",
+    ],
+  },
+  {
+    slug: "tudoprabarco",
+    category: "Plataforma / Marketplace",
+    span: "narrow",
+    description:
+      "Marketplace digital que conecta empresas, prestadores e usuários do setor náutico.",
+    keywords: ["Full Stack", "Usuários e empresas", "Busca e filtros", "Avaliações", "Chat", "Pagamentos"],
+  },
+] as const;
+
+/**
+ * Aprofundamento do case principal, depois de "Projetos selecionados" — essa
+ * seção NÃO reapresenta o projeto (nome, funcionalidades, preview e CTA já
+ * apareceram no card). Ela muda de função: conta como o sistema foi pensado,
+ * problema → decisão → solução, até a engenharia por trás da interface.
+ *
+ * Tudo abaixo é uma curadoria/paráfrase do case completo em
+ * `projects[0].case.blocks` (contexto, problema, antes-e-depois, solução,
+ * funcionalidades, multiempresa, estoque, scanner, usuarios-e-permissoes,
+ * seguranca) — nenhum fato novo, só reorganizado para a leitura da home.
+ * `engenharia.points` evita a palavra "auditoria" de propósito: o bloco
+ * `seguranca` do case é explícito que uma auditoria técnica verificada ainda
+ * não existe; o que está confirmado é o histórico de movimentações, citado
+ * como tal.
+ */
+export const platotruckCase = {
+  eyebrow: "Case em destaque",
+  name: "Sistema de Gestão PlatoTruck",
+  intro: "O sistema começou com um problema operacional, não com uma lista de funcionalidades.",
+  contexto: {
+    label: "Contexto",
+    body: "A operação envolve cinco CNPJs relacionados, que compartilham rotinas de estoque e precisam ser acompanhados separadamente e em conjunto — um arranjo que raramente cabe em um software genérico.",
+  },
+  problema: {
+    label: "Problema",
+    body: "O controle acontecia em planilhas e processos manuais: contagens repetidas e sujeitas a erro, divergências entre o que estava registrado e o que existia fisicamente, informação espalhada entre arquivos e responsáveis, e nenhum histórico consolidado das movimentações.",
+  },
+  porque: {
+    label: "Por que um sistema interno",
+    body: "Um software genérico não bastava: cada empresa precisa manter seus próprios produtos e saldos, mas as pessoas transitam entre elas no dia a dia. A solução precisava tratar a empresa como parte do contexto de uso — não como um filtro opcional — e reunir estoque, movimentações e acessos em um único lugar.",
+  },
+  building: {
+    label: "Como construí",
+    lead: "A partir daí, cada funcionalidade nasceu de uma decisão concreta:",
+    decisions: [
+      {
+        title: "Multiempresa",
+        problem: "Diferentes empresas precisavam operar sem misturar informações.",
+        decision:
+          "O sistema passou a trabalhar com seleção de empresa: o usuário escolhe com qual empresa está operando, e dados e funcionalidades respeitam esse escopo.",
+      },
+      {
+        title: "Usuários, permissões e controle de acesso",
+        problem: "Nem todo mundo que usa o sistema deveria enxergar ou alterar tudo.",
+        decision:
+          "Autenticação, cadastro de usuários e níveis de acesso, aplicados junto com a empresa selecionada — o par que define o que cada pessoa acessa.",
+      },
+      {
+        title: "Estoque e inventário",
+        problem: "Contagens manuais e divergências entre o registrado e o que existia fisicamente.",
+        decision:
+          "Produtos, locais e saldos cadastrados no sistema, com inventário para conferência do que está registrado.",
+      },
+      {
+        title: "Movimentações e transferências",
+        problem: "Sem histórico consolidado, reconstruir o que tinha acontecido exigia investigação.",
+        decision:
+          "Entradas, retiradas e transferências entre locais passaram a ser registradas, com histórico consultável por produto, empresa e usuário.",
+      },
+      {
+        title: "Scanner",
+        problem: "A retirada de produtos dependia de digitação manual, item por item.",
+        decision:
+          "Um fluxo de retirada por leitura de código, que identifica o produto sem digitação durante a operação.",
+      },
+      {
+        title: "Dashboards",
+        problem: "Acompanhar a operação e a área comercial exigia montar relatórios à parte.",
+        decision:
+          "Dashboards e funcionalidades comerciais dentro do próprio sistema, no escopo da empresa selecionada.",
+      },
+    ],
+  },
+  engenharia: {
+    label: "Engenharia",
+    lead: "Não foi só interface.",
+    points: [
+      "Regras de acesso e de negócio validadas no servidor, não só escondidas na tela",
+      "Autorização por nível de usuário, combinada com a empresa selecionada",
+      "Validação de dados antes de persistir",
+      "Controles também na camada de banco de dados, além da aplicação",
+      "Histórico de movimentações por produto, empresa e usuário",
+    ],
+  },
+  mudanca: {
+    label: "Mudança operacional",
+    before: "Controles manuais e informações espalhadas.",
+    after: "Uma operação centralizada, com histórico e acesso estruturado.",
+  },
+  cta: "Explorar o case completo",
+} as const;
+
 type BeforeAfterBlock = Extract<CaseBlock, { kind: "beforeAfter" }>;
 
 /**
@@ -590,4 +738,19 @@ export function getFeaturedBeforeAfter(): BeforeAfterBlock | null {
     (candidate): candidate is BeforeAfterBlock => candidate.kind === "beforeAfter",
   );
   return block ?? null;
+}
+
+type ScreenshotsBlock = Extract<CaseBlock, { kind: "screenshots" }>;
+
+/**
+ * Uma screenshot específica do case principal, pelo `id` do bloco (ex.:
+ * "tela-sistema"), para intercalar telas grandes reais no aprofundamento da
+ * home — mesma fonte do case completo, nunca uma imagem/legenda solta.
+ */
+export function getFeaturedScreenshot(blockId: string): Screenshot | null {
+  const block = featuredProject.case?.blocks.find(
+    (candidate): candidate is ScreenshotsBlock =>
+      candidate.kind === "screenshots" && candidate.id === blockId,
+  );
+  return block?.items[0] ?? null;
 }

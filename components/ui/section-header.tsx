@@ -23,7 +23,7 @@ export function SectionHeader({
   label,
   title,
   lead,
-  tone = "paper",
+  tone = "base",
   as: Heading = "h2",
   className,
 }: SectionHeaderProps) {
@@ -41,7 +41,7 @@ export function SectionHeader({
         <div className="lg:col-span-9 xl:col-span-6">
           <Heading
             className={cn(
-              "text-balance-title max-w-[18ch] text-title font-medium",
+              "text-balance-title max-w-[18ch] text-heading-xl font-medium",
               style.title,
             )}
           >
@@ -52,7 +52,7 @@ export function SectionHeader({
 
       {lead ? (
         <div className="lg:col-span-9 lg:col-start-4 xl:col-span-4 xl:col-start-auto xl:pt-2">
-          <p className={cn("max-w-[46ch] text-lead", style.lead)}>{lead}</p>
+          <p className={cn("max-w-[46ch] text-body-lg", style.lead)}>{lead}</p>
         </div>
       ) : null}
     </Reveal>

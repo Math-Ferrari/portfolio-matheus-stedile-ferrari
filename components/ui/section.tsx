@@ -25,7 +25,7 @@ export function Section({
   title,
   lead,
   children,
-  tone = "paper",
+  tone = "base",
   wide = false,
   className,
 }: SectionProps) {

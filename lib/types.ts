@@ -123,15 +123,16 @@ export type Project = {
   outcome: string;
   /** Destaques curtos do que foi construído (usado no card em destaque). */
   highlights: string[];
+  /**
+   * 3–6 palavras-chave curtas para a apresentação enxuta de home (teaser).
+   * Cada uma precisa ser rastreável a algo real em `case.blocks` — não é um
+   * resumo de marketing, é a versão mais curta possível dos mesmos fatos.
+   */
+  tags?: string[];
   tech: string[];
   links: LinkItem[];
   cover: Screenshot;
   case: CaseStudy | null;
-};
-
-export type Capability = {
-  title: string;
-  description: string;
 };
 
 export type ContactLink = {
