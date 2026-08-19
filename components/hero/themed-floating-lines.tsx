@@ -13,12 +13,42 @@ import { useTheme } from "@/components/theme/theme-provider";
  * que mantém o "bottom" (a fita principal) livre de vermelho por completo.
  */
 const DARK_GRADIENT = ["#00aaff", "#ff0000", "#0061ff"];
-const LIGHT_GRADIENT = ["#0a84c4", "#c4281e", "#0047c2"];
+/**
+ * Cores puras e saturadas — não as mesmas (mais fundas) de `--accent-*` no
+ * light mode em `globals.css`. Aquelas foram calibradas para texto/botões
+ * sobre off-white (precisam de contraste de LEITURA); estas são para o
+ * NÚCLEO do glow, que já teve seu próprio problema de saturação resolvido
+ * via `uColorBoost` (ver floating-lines.tsx) — cores desbotadas aqui
+ * combinadas com o boost ainda saturariam pouco. Igual ao escuro, a ordem é
+ * [azul claro, vermelho, azul] (ver comentário grande abaixo).
+ */
+const LIGHT_GRADIENT = ["#20b8ff", "#f22d3d", "#1261ff"];
 
 /** Mesmos hex de `--background` em `app/globals.css`, para o shader compor
     exatamente o fundo do tema onde não há linha (ver `uBaseColor`). */
 const DARK_BASE = "#050505";
 const LIGHT_BASE = "#f6f2ea";
+
+/**
+ * Só o tema claro precisa: sobre `--background` quase preto, misturar pouco
+ * com a base já lê como "cor escurecida", nunca lava o matiz — sobre
+ * off-white o mesmo mix baixo lê como pastel (um vermelho pouco saturado
+ * sobre branco É rosa, por definição). O boost aproxima mais do traço de
+ * glowMask = 1 (cor cheia) sem estourar além dela — ver `uColorBoost`.
+ * Calibrado para o núcleo virar cor sólida e só a borda/halo continuar
+ * suave, não para "gritar": revisite visualmente se ainda ler apagado.
+ */
+const LIGHT_COLOR_BOOST = 2.4;
+
+/**
+ * Extra só do `top` (o único wave com vermelho, peso 0.1 — ver `uTopBoost`
+ * no shader). Sem isto o vermelho nunca sai do pastel mesmo com
+ * `LIGHT_COLOR_BOOST`: a 2.4x seu pico mal passa de 20% de saturação, e
+ * vermelho pouco saturado sobre off-white é rosa por definição, não uma
+ * questão de qual hex usar. Multiplica-se a `LIGHT_COLOR_BOOST` (total
+ * ~2.4 × 3 = 7.2 só no `top`), não o substitui.
+ */
+const LIGHT_TOP_BOOST = 3;
 
 /**
  * A composição (posição/rotação das três famílias de linhas, contagem,
@@ -55,6 +85,8 @@ export function ThemedFloatingLines() {
     <FloatingLines
       linesGradient={isDark ? DARK_GRADIENT : LIGHT_GRADIENT}
       baseColor={isDark ? DARK_BASE : LIGHT_BASE}
+      colorBoost={isDark ? 1 : LIGHT_COLOR_BOOST}
+      topBoost={isDark ? 1 : LIGHT_TOP_BOOST}
       mixBlendMode="normal"
       enabledWaves={["top", "middle", "bottom"]}
       lineCount={[3, 1, 2]}

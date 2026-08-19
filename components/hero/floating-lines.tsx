@@ -84,6 +84,40 @@ uniform int lineGradientCount;
  */
 uniform vec3 uBaseColor;
 
+/**
+ * Segundo acréscimo ao shader original (o primeiro é uBaseColor, acima).
+ * Antes do glow/mix final, \`col\` (soma vetorial das linhas visíveis num
+ * pixel) raramente ultrapassa magnitude 1 no pico de uma linha "fraca" (ex.:
+ * o wave \`bottom\`, com peso 0.2) — glowMask = clamp(length(col), 0, 1) fica
+ * bem abaixo de 1, então a maior parte do traço nunca chega perto da cor
+ * pura e passa a maior parte do tempo misturada com uBaseColor.
+ *
+ * Sobre preto (dark) isso já lê bem: misturar pouco com preto só escurece a
+ * cor, sem lavar o matiz. Sobre off-white (light) o mesmo mix baixo lava a
+ * cor para pastel — e um vermelho pouco saturado sobre branco é, por
+ * definição, rosa. uColorBoost escala \`col\` (mesma direção/matiz, já que é
+ * um escalar uniforme) só para aproximar mais pixels de glowMask = 1 — o
+ * NÚCLEO passa a carregar a cor cheia por um raio maior; a cauda (halo)
+ * mantém a mesma curva de queda, só cruza o teto de saturação mais cedo.
+ * Não pode estourar além da própria cor (glowMask segue clampado em 1), então
+ * não vira neon/HDR. Default 1.0 reproduz exatamente o comportamento
+ * original — só o tema claro usa um valor maior (ver themed-floating-lines).
+ */
+uniform float uColorBoost;
+
+/**
+ * Multiplicador extra só do wave "top" (soma-se a uColorBoost, não o
+ * substitui). Existe porque "top" já nasce com peso 0.1 no acúmulo de col
+ * (dez vezes mais fraco que "middle") — é o único wave que carrega vermelho
+ * (ver themed-floating-lines.tsx), então mesmo com uColorBoost alto seu pico
+ * continua muito abaixo de glowMask = 1. Sobre off-white isso não lê como
+ * "vermelho fraco": um vermelho pouco saturado misturado com branco É rosa,
+ * por definição — não tem como corrigir isso escalando todo mundo igual,
+ * porque "middle"/"bottom" (azuis) já saturam bem antes de "top" chegar
+ * perto. Default 1.0 (sem efeito; dark mode não usa isto).
+ */
+uniform float uTopBoost;
+
 const vec3 BLACK = vec3(0.0);
 const vec3 PINK  = vec3(233.0, 71.0, 245.0) / 255.0;
 const vec3 BLUE  = vec3(47.0,  75.0, 162.0) / 255.0;
@@ -216,7 +250,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         baseUv,
         mouseUv,
         interactive
-      ) * 0.1;
+      ) * 0.1 * uTopBoost;
     }
   }
 
@@ -231,6 +265,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
      de exibicao do original já fazia. Com uBaseColor claro, a mesma conta
      funciona sem lavar a cor: a cauda (magnitude baixa) fica quase toda
      fundo, o nucleo (magnitude alta) satura na cor cheia da linha. */
+  col *= uColorBoost;
   float glowLength = length(col);
   float glowMask = clamp(glowLength, 0.0, 1.0);
   vec3 lineHue = col / max(glowLength, 1e-5);
@@ -303,6 +338,20 @@ export type FloatingLinesProps = {
    * exatamente o comportamento original.
    */
   baseColor?: string;
+  /**
+   * Escala a magnitude de `col` antes do glow/mix final (ver `uColorBoost`
+   * no shader acima) — só afeta quanto do traço chega a glowMask = 1 (cor
+   * cheia), não a posição/forma das linhas. Default `1` reproduz o
+   * comportamento original.
+   */
+  colorBoost?: number;
+  /**
+   * Multiplicador extra só do wave `top` (ver `uTopBoost` no shader) — o
+   * único que carrega vermelho na composição atual, e o único com peso tão
+   * baixo (0.1) que `colorBoost` sozinho não é suficiente para tirá-lo do
+   * pastel. Default `1` reproduz o comportamento original.
+   */
+  topBoost?: number;
 };
 
 export default function FloatingLines({
@@ -322,6 +371,8 @@ export default function FloatingLines({
   parallaxStrength = 0.2,
   mixBlendMode = "screen",
   baseColor = "#000000",
+  colorBoost = 1,
+  topBoost = 1,
 }: FloatingLinesProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetMouseRef = useRef(new Vector2(-1000, -1000));
@@ -421,6 +472,8 @@ export default function FloatingLines({
       lineGradientCount: { value: 0 },
 
       uBaseColor: { value: hexToVec3(baseColor) },
+      uColorBoost: { value: colorBoost },
+      uTopBoost: { value: topBoost },
     };
 
     if (linesGradient && linesGradient.length > 0) {
@@ -586,6 +639,8 @@ export default function FloatingLines({
   }, [
     linesGradient,
     baseColor,
+    colorBoost,
+    topBoost,
     enabledWaves,
     lineCount,
     lineDistance,

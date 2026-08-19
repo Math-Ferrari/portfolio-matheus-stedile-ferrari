@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLenis } from "lenis/react";
 import { Menu, X } from "lucide-react";
 
 import { LanguageToggle } from "@/components/hero/language-toggle";
@@ -30,9 +31,27 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [coverVisible, setCoverVisible] = useState(false);
   const pathname = usePathname();
+  const lenis = useLenis();
 
   /** A capa só existe na home; nas demais rotas o header já nasce com fundo. */
   const hasCover = pathname === "/";
+
+  /**
+   * Já na home, `href="/"` não dispara navegação (mesma URL) — sem isto o
+   * clique não faria nada. Fora dela, deixamos o `<Link>` navegar normal:
+   * ele já entra no topo da página seguinte.
+   */
+  const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname !== "/") {
+      return;
+    }
+    event.preventDefault();
+    if (lenis) {
+      lenis.scrollTo(0, { duration: 1.2 });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -91,14 +110,18 @@ export function SiteHeader() {
     >
       <Container>
         <div className="flex h-16 items-center justify-between gap-6">
-          <span
+          <Link
+            href="/"
+            onClick={handleHomeClick}
+            aria-label="Portfólio — 2026, ir para a página inicial"
+            aria-current={pathname === "/" ? "page" : undefined}
             className={cn(
-              "shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-foreground/70",
+              "shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-foreground/70 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
               heroLegibility,
             )}
           >
             Portfólio — 2026
-          </span>
+          </Link>
 
           {/* `lg` e não `md`: com cinco itens + assinatura + CTA, a barra
               completa não cabe em larguras de tablet (~820px) — em `md` a

@@ -59,10 +59,11 @@ export function InteractiveHero() {
         <div className="hero-fade-blur hero-d4 mt-6 flex flex-col gap-1.5 drop-shadow-[0_2px_16px_var(--background)]">
           {/* Único texto do hero com a paleta da identidade — degradê discreto
               via `bg-clip-text`, sem glow/sombra colorida. Nenhum outro texto
-              da hero recebe esse tratamento. As cores do degradê acompanham
-              o par claro/azul/vermelho recalibrado por tema via variáveis
-              CSS — mesma identidade, intensidade ajustada por fundo. */}
-          <p className="bg-gradient-to-r from-accent-blue-light via-accent-blue to-accent-red bg-clip-text text-[1.05rem] font-medium text-transparent md:text-[1.15rem]">
+              da hero recebe esse tratamento. Usa `--hero-tagline-*` (não
+              `--accent-*`, usado em botões/links do site inteiro) para poder
+              acompanhar a cor cheia do núcleo do FloatingLines no light mode
+              sem alterar mais nada fora da hero — ver `globals.css`. */}
+          <p className="bg-gradient-to-r from-[var(--hero-tagline-blue-light)] via-[var(--hero-tagline-blue)] to-[var(--hero-tagline-red)] bg-clip-text text-[1.05rem] font-medium text-transparent md:text-[1.15rem]">
             {site.positioning}
           </p>
           <p className="text-[0.95rem] text-foreground/70 md:text-base">{site.summary}</p>

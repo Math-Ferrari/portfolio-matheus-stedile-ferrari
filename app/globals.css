@@ -31,6 +31,15 @@
   --accent-blue: #0061ff;
   --accent-red: #ff0000;
 
+  /* Só a linha de cargo da hero (`InteractiveHero`) usa estas — mesmos tons
+     do dark de `--accent-*` acima, para não mudar nada aqui. Existem à parte
+     porque o par light abaixo precisa ficar mais vivo que `--accent-*`
+     (calibrado para leitura em botões/links no site inteiro), acompanhando o
+     FloatingLines sem alterar CTA, sublinhado de nav ou rodapé. */
+  --hero-tagline-blue-light: #00aaff;
+  --hero-tagline-blue: #0061ff;
+  --hero-tagline-red: #ff0000;
+
   /*
    * Cenas — a mesma identidade da hero em variações sutis de tom, para as
    * seções abaixo dela nunca empilharem o mesmo preto repetido. Cada seção
@@ -59,6 +68,19 @@
   --accent-blue-light: #0a84c4;
   --accent-blue: #0047c2;
   --accent-red: #c4281e;
+
+  /* Mais saturadas que `--accent-*` acima, mas SEM copiar o hex cheio do
+     núcleo do FloatingLines (`LIGHT_GRADIENT` em `themed-floating-lines.tsx`)
+     — aquele é calibrado para o centro de um glow sobre o próprio
+     `--background`, não para texto: testado contra WCAG (fundo #f6f2ea),
+     `#20b8ff`/`#f22d3d` cru caem para ~3:1, abaixo de AA. Cada stop aqui
+     segura o mesmo matiz do núcleo, saturação alta, mas luminância só o
+     quanto o contraste permite — blue-light já nasce perto do teto (mesma
+     lightness do `--accent-blue-light` atual, só mais saturado: contraste
+     não piora); blue/red tinham folga e foram escurecidos até ~4.4–4.5:1. */
+  --hero-tagline-blue-light: #0286cc;
+  --hero-tagline-blue: #1261ff;
+  --hero-tagline-red: #d61f2c;
 
   /* Mesmos seis papéis do escuro, cada um com seu par claro: off-white,
      off-white ainda mais suave, azul-acinzentado muito pálido, bege-cinza
