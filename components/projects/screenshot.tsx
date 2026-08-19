@@ -39,6 +39,13 @@ type FrameProps = {
 /**
  * Área reservada para uma screenshot. Sem `src`, mostra um placeholder
  * explicitamente identificado como pendente — nunca uma interface fictícia.
+ *
+ * Com `width`/`height` reais (screenshots verdadeiras, não placeholder), a
+ * imagem usa sua PRÓPRIA proporção — `next/image` com dimensão intrínseca e
+ * `h-auto w-full`, nunca `fill`/`object-cover` — para nunca cortar conteúdo
+ * da interface só para caber numa caixa 16:10 arbitrária. Sem `width`/
+ * `height` (placeholder, ou screenshot ainda sem dimensão conhecida), cai no
+ * comportamento original: caixa de proporção fixa por `frame`.
  */
 export function ScreenshotFrame({
   screenshot,
@@ -49,6 +56,30 @@ export function ScreenshotFrame({
   className,
 }: FrameProps) {
   const frame = screenshot.frame ?? "desktop";
+  const hasNaturalSize = Boolean(screenshot.src && screenshot.width && screenshot.height);
+
+  if (hasNaturalSize) {
+    return (
+      <div
+        className={cn(
+          "overflow-hidden",
+          bare ? "rounded-none" : "rounded-md border",
+          frameByTone[tone],
+          className,
+        )}
+      >
+        <Image
+          src={screenshot.src!}
+          alt={screenshot.alt}
+          width={screenshot.width}
+          height={screenshot.height}
+          sizes={sizes}
+          priority={priority}
+          className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.01]"
+        />
+      </div>
+    );
+  }
 
   return (
     <div

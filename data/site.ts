@@ -154,17 +154,18 @@ export const heroVisual: Screenshot = {
 
 /**
  * Apresentação — a ÚNICA vez que o posicionamento é declarado no corpo da
- * home (a hero já mostra "Engenheiro de Software · Desenvolvimento Full
- * Stack" na capa; repetir o cargo aqui embaixo seria a mesma frase duas
- * vezes). Esta seção assume que o cargo já foi lido e fala do que constrói.
+ * home. O heading fala do que construo ("Software para operações reais.");
+ * o cargo aparece só uma vez abaixo dele, dentro do parágrafo, em prosa
+ * pessoal — não repetido como um segundo heading, que é como a hero já o
+ * mostra ("Engenheiro de Software · Desenvolvimento Full Stack" na capa). Um
+ * parágrafo curto só, de propósito: essa seção precisa ser lida em segundos.
  * A antiga seção "Sobre" (quatro parágrafos, mais abaixo) foi removida por
  * dizer o mesmo com outras palavras — o que ela tinha de próprio (graduação)
  * está em `about`, que continua exportado para uma futura página /sobre.
  */
 export const profile = {
   heading: "Software para operações reais.",
-  lead: "Desenvolvo sistemas de ponta a ponta, do entendimento da regra de negócio à interface usada no dia a dia.",
-  detail: "Sistemas internos, aplicações web, integrações, dados e regras de negócio.",
+  body: "Sou Engenheiro de Software e Desenvolvedor Full Stack. Trabalho do frontend ao backend, criando sistemas internos, aplicações web e integrações a partir de problemas e regras de negócio reais.",
 } as const;
 
 /**

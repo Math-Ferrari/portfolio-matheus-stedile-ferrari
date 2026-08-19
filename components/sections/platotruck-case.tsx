@@ -2,20 +2,23 @@ import { ScreenshotFrame } from "@/components/projects/screenshot";
 import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
-import { featuredProject, getFeaturedScreenshot, platotruckCase } from "@/data/projects";
+import { featuredProject, platotruckCase } from "@/data/projects";
 
 /**
  * Aprofundamento do case principal — muda de função em relação ao card de
  * "Projetos selecionados" logo acima: não repete nome, funcionalidades,
  * preview nem CTA, conta como o sistema foi pensado. Contexto → problema →
  * por que um sistema interno → decisões (problema→solução, uma por
- * funcionalidade) → engenharia → mudança operacional, com uma screenshot
- * grande entre os blocos mais técnicos. Um único CTA, no fim.
+ * funcionalidade) → engenharia → mudança operacional.
+ *
+ * As decisões correm em coluna única, não em grid — a screenshot real de
+ * usuários/permissões (`public/2.png`) e de inventário (`public/3.png`)
+ * entra dentro da própria decisão a que pertence, não numa galeria à parte.
+ * A screenshot de visão geral (`public/1.png`) não reaparece aqui: ela já é
+ * a capa do projeto no card logo acima.
  */
 export function PlatoTruckCase() {
   const { contexto, problema, porque, building, engenharia, mudanca } = platotruckCase;
-  const systemShot = getFeaturedScreenshot("tela-sistema");
-  const permissionsShot = getFeaturedScreenshot("tela-permissoes");
 
   return (
     <section id="case-platotruck" className="bg-tone-slate">
@@ -43,8 +46,9 @@ export function PlatoTruckCase() {
           ))}
         </Reveal>
 
-        {/* Como construí — a screenshot do sistema entra logo no início do
-            bloco: aqui está o resultado das decisões que seguem. */}
+        {/* Como construí — cada funcionalidade nasceu de uma decisão; as duas
+            com screenshot real ficam maiores na sequência, não numa galeria
+            separada. */}
         <Reveal delay={80} className="mt-20">
           <p className="text-caption font-medium uppercase tracking-[0.18em] text-accent-blue">
             {building.label}
@@ -54,37 +58,30 @@ export function PlatoTruckCase() {
           </p>
         </Reveal>
 
-        {systemShot ? (
-          <Reveal delay={80} className="mt-10">
-            <ScreenshotFrame screenshot={systemShot} tone="elevated" sizes="(min-width: 1024px) 78rem, 100vw" className="rounded-lg" />
-          </Reveal>
-        ) : null}
-
-        <Reveal delay={80} className="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2">
+        <div className="mt-12 flex flex-col gap-12">
           {building.decisions.map((item) => (
-            <div key={item.title} className="border-t border-border pt-5">
-              <h3 className="font-medium text-foreground">{item.title}</h3>
-              <p className="mt-3 max-w-[40ch] text-sm text-muted">{item.problem}</p>
-              <p className="mt-2 max-w-[40ch] text-sm text-foreground">↓ {item.decision}</p>
-            </div>
+            <Reveal key={item.title} className="border-t border-border pt-8">
+              <h3 className="text-heading-md font-medium text-foreground">{item.title}</h3>
+              <p className="mt-3 max-w-[52ch] text-muted">{item.problem}</p>
+              <p className="mt-2 max-w-[52ch] text-foreground">↓ {item.decision}</p>
+
+              {"screenshot" in item ? (
+                <div className="mt-8">
+                  <ScreenshotFrame
+                    screenshot={item.screenshot}
+                    tone="elevated"
+                    sizes="(min-width: 1024px) 78rem, 100vw"
+                    className="rounded-lg"
+                  />
+                </div>
+              ) : null}
+            </Reveal>
           ))}
-        </Reveal>
+        </div>
 
-        {/* Engenharia — a screenshot de permissões faz a ponte entre "como
-            construí" (interface) e "não foi só interface" (regras por trás
-            dela). */}
-        {permissionsShot ? (
-          <Reveal delay={80} className="mt-20">
-            <ScreenshotFrame
-              screenshot={permissionsShot}
-              tone="elevated"
-              sizes="(min-width: 1024px) 78rem, 100vw"
-              className="rounded-lg"
-            />
-          </Reveal>
-        ) : null}
-
-        <Reveal delay={80} className="mt-14 grid gap-x-12 gap-y-6 lg:grid-cols-12">
+        {/* Engenharia — reforça, logo depois de usuários/permissões e
+            inventário, que o acesso e os dados não dependem só da tela. */}
+        <Reveal delay={80} className="mt-20 grid gap-x-12 gap-y-6 border-t border-border pt-10 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="text-caption font-medium uppercase tracking-[0.18em] text-accent-blue">
               {engenharia.label}

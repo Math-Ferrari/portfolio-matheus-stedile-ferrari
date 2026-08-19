@@ -1,4 +1,4 @@
-import type { CaseBlock, Project, Screenshot } from "@/lib/types";
+import type { CaseBlock, Project } from "@/lib/types";
 
 /**
  * ────────────────────────────────────────────────────────────────────────────
@@ -44,10 +44,12 @@ export const projects: Project[] = [
     tech: [],
     links: [],
     cover: {
-      src: "",
-      alt: "Tela principal do Sistema de Gestão PlatoTruck",
-      caption: "Visão geral do sistema.",
+      src: "/1.png",
+      alt: "Painel de visão geral do Sistema de Gestão PlatoTruck",
+      caption: "Painel — visão geral da operação da empresa selecionada.",
       frame: "desktop",
+      width: 1906,
+      height: 947,
     },
     case: {
       intro: [
@@ -382,10 +384,12 @@ export const projects: Project[] = [
     tech: ["React", "Next.js", "TypeScript", "Node.js", "NestJS", "PostgreSQL", "Supabase"],
     links: [], // TODO: adicionar link público, se houver.
     cover: {
-      src: "",
-      alt: "Interface da plataforma tudoPrabarco",
-      caption: "Catálogo de prestadores.",
+      src: "/5.png",
+      alt: "Página inicial da plataforma tudoPrabarco",
+      caption: "Página inicial — busca e categorias de serviços náuticos.",
       frame: "desktop",
+      width: 1904,
+      height: 945,
     },
     case: {
       intro: [
@@ -508,10 +512,12 @@ export const projects: Project[] = [
     tech: [],
     links: [], // TODO: adicionar a URL do site.
     cover: {
-      src: "",
+      src: "/4.png",
       alt: "Página inicial do site PlatoTruck.com",
       caption: "Home do site institucional.",
       frame: "desktop",
+      width: 1893,
+      height: 938,
     },
     case: {
       intro: [
@@ -599,39 +605,22 @@ export const selectedProjects = [
     slug: "sistema-platotruck",
     category: "Sistema interno",
     span: "full",
-    description:
-      "Sistema interno multiempresa desenvolvido para centralizar operações de estoque, usuários e processos internos.",
-    keywords: [
-      "Multiempresa",
-      "Inventário",
-      "Usuários e permissões",
-      "Scanner",
-      "Segurança",
-      "Movimentações",
-      "Gestão de estoque",
-      "Dashboards",
-    ],
+    description: "Sistema interno multiempresa para centralizar operações, estoque e controle de acesso.",
+    keywords: ["Multiempresa", "Permissões", "Segurança", "Estoque", "Inventário", "Scanner"],
   },
   {
     slug: "platotruck-site",
     category: "Site institucional",
     span: "wide",
-    description:
-      "Site institucional desenvolvido para apresentar a PlatoTruck, seus produtos e sua atuação.",
-    keywords: [
-      "Desenvolvimento web",
-      "Interface responsiva",
-      "Apresentação institucional",
-      "Produtos e conteúdo",
-    ],
+    description: "Site institucional desenvolvido para apresentar a empresa, seus produtos e sua atuação.",
+    keywords: ["Web", "Responsivo", "Produtos", "Institucional"],
   },
   {
     slug: "tudoprabarco",
     category: "Plataforma / Marketplace",
     span: "narrow",
-    description:
-      "Marketplace digital que conecta empresas, prestadores e usuários do setor náutico.",
-    keywords: ["Full Stack", "Usuários e empresas", "Busca e filtros", "Avaliações", "Chat", "Pagamentos"],
+    description: "Marketplace digital para o setor náutico.",
+    keywords: ["Full Stack", "Marketplace", "Busca", "Avaliações", "Chat"],
   },
 ] as const;
 
@@ -649,6 +638,12 @@ export const selectedProjects = [
  * `seguranca` do case é explícito que uma auditoria técnica verificada ainda
  * não existe; o que está confirmado é o histórico de movimentações, citado
  * como tal.
+ *
+ * As screenshots reais (`public/2.png`, `public/3.png`) entram só nas duas
+ * decisões a que pertencem (usuários/permissões e estoque/inventário) — de
+ * propósito, não logo no início do bloco: `public/1.png` já é a capa do
+ * projeto no card de "Projetos selecionados" um pouco acima, então repeti-la
+ * aqui seria a mesma imagem duas vezes na mesma tela.
  */
 export const platotruckCase = {
   eyebrow: "Case em destaque",
@@ -678,15 +673,30 @@ export const platotruckCase = {
       },
       {
         title: "Usuários, permissões e controle de acesso",
-        problem: "Nem todo mundo que usa o sistema deveria enxergar ou alterar tudo.",
+        problem:
+          "A operação envolve diferentes funções e empresas — acesso não podia ser apenas \"logado ou deslogado\".",
         decision:
-          "Autenticação, cadastro de usuários e níveis de acesso, aplicados junto com a empresa selecionada — o par que define o que cada pessoa acessa.",
+          "O sistema passou a controlar o que cada usuário pode visualizar e executar, combinando autenticação, perfil de acesso e as empresas permitidas para aquele usuário.",
+        screenshot: {
+          src: "/2.png",
+          alt: "Tela de cadastro de usuário com perfis de acesso e empresas permitidas",
+          caption: "Usuários e permissões — perfis de acesso e empresas permitidas por usuário.",
+          width: 1896,
+          height: 947,
+        },
       },
       {
         title: "Estoque e inventário",
         problem: "Contagens manuais e divergências entre o registrado e o que existia fisicamente.",
         decision:
-          "Produtos, locais e saldos cadastrados no sistema, com inventário para conferência do que está registrado.",
+          "O inventário deixou de ser uma contagem pontual: produtos, saldos e locais ficam organizados no sistema, com filtros para consulta e conferência a qualquer momento.",
+        screenshot: {
+          src: "/3.png",
+          alt: "Tela de inventário com filtros e lista de saldos por produto",
+          caption: "Inventário — saldos, locais e status de estoque por produto.",
+          width: 1895,
+          height: 941,
+        },
       },
       {
         title: "Movimentações e transferências",
@@ -738,19 +748,4 @@ export function getFeaturedBeforeAfter(): BeforeAfterBlock | null {
     (candidate): candidate is BeforeAfterBlock => candidate.kind === "beforeAfter",
   );
   return block ?? null;
-}
-
-type ScreenshotsBlock = Extract<CaseBlock, { kind: "screenshots" }>;
-
-/**
- * Uma screenshot específica do case principal, pelo `id` do bloco (ex.:
- * "tela-sistema"), para intercalar telas grandes reais no aprofundamento da
- * home — mesma fonte do case completo, nunca uma imagem/legenda solta.
- */
-export function getFeaturedScreenshot(blockId: string): Screenshot | null {
-  const block = featuredProject.case?.blocks.find(
-    (candidate): candidate is ScreenshotsBlock =>
-      candidate.kind === "screenshots" && candidate.id === blockId,
-  );
-  return block?.items[0] ?? null;
 }

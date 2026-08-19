@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { FramedVisual } from "@/components/projects/framed-visual";
 import { ScreenshotFrame } from "@/components/projects/screenshot";
 import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
@@ -14,7 +13,8 @@ type Showcase = (typeof selectedProjects)[number];
  * Bloco de texto compartilhado pelos três projetos — mesma ordem de leitura
  * (categoria → nome → descrição → palavras-chave → CTA) em todos, para a
  * seção ler como um sistema. O que muda entre eles é a ESCALA e a
- * composição ao redor, não a estrutura da informação.
+ * composição ao redor, não a estrutura da informação. Palavras-chave sempre
+ * numa linha só, separadas por "·" — nunca pill.
  */
 function ProjectCopy({
   showcase,
@@ -46,30 +46,13 @@ function ProjectCopy({
         </Link>
       </h3>
 
-      <p
-        className={cn(
-          "mt-5 text-muted",
-          size === "lg" ? "max-w-[46ch] text-body-lg" : "max-w-[44ch]",
-        )}
-      >
+      <p className={cn("mt-4 max-w-[52ch] text-muted", size === "lg" && "text-body-lg")}>
         {showcase.description}
       </p>
 
-      {/* Palavras-chave: no projeto principal viram um grid tipográfico de
-          duas colunas (oito itens leem melhor alinhados que numa linha
-          corrida); nos outros dois, uma linha separada por "·". Nunca
-          pills. */}
-      {size === "lg" ? (
-        <ul className="mt-8 grid max-w-[30rem] grid-cols-2 gap-x-8 gap-y-2.5 text-sm text-muted">
-          {showcase.keywords.map((keyword) => (
-            <li key={keyword}>{keyword}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-5 max-w-[44ch] text-sm text-muted">{showcase.keywords.join(" · ")}</p>
-      )}
+      <p className="mt-4 max-w-[52ch] text-sm text-muted">{showcase.keywords.join(" · ")}</p>
 
-      <ActionLink href={href} variant="quiet" className={size === "lg" ? "mt-10" : "mt-7"}>
+      <ActionLink href={href} variant="quiet" className="mt-7">
         {showcase.slug === "sistema-platotruck" ? "Ver case" : "Ver projeto"}
       </ActionLink>
     </div>
@@ -78,14 +61,16 @@ function ProjectCopy({
 
 /**
  * Projetos selecionados — três projetos, três pesos visuais explícitos. A
- * hierarquia é a mensagem: o primeiro ocupa a largura inteira com o preview
- * grande ao lado do texto; os outros dois dividem a linha seguinte em 7/12 e
- * 5/12, com previews proporcionais. Ninguém precisa ler para saber qual é o
+ * hierarquia é a mensagem: o primeiro ocupa a largura inteira, com a
+ * screenshot grande em cima e o texto abaixo; os outros dois dividem a linha
+ * seguinte em 7/12 e 5/12, na mesma composição (imagem em cima, texto
+ * embaixo), só em escala menor. Ninguém precisa ler para saber qual é o
  * projeto principal.
  *
- * Cada projeto é uma unidade por superfície + respiro + escala (não por
- * linha divisória nem por três cards iguais): a mesma `bg-surface` com borda
- * mínima, mas composição interna diferente em cada um.
+ * As três screenshots são reais (`public/1.png`, `4.png`, `5.png`) — sem
+ * moldura artificial ao redor: `ScreenshotFrame` só dá uma superfície e um
+ * radius discretos, na proporção original da imagem (nunca cortada). A
+ * hierarquia vem de espaço, superfície e escala, não de decoração.
  */
 export function SelectedProjects() {
   const [featured, wide, narrow] = selectedProjects;
@@ -100,28 +85,28 @@ export function SelectedProjects() {
           <h2 className="text-heading-xl font-medium text-foreground">Projetos selecionados</h2>
         </Reveal>
 
-        {/* 1º — largura inteira, texto e preview lado a lado. */}
+        {/* 1º — largura inteira, screenshot grande em cima, texto embaixo. */}
         {featuredProject ? (
           <Reveal
             delay={80}
-            className="mt-14 grid items-center gap-10 rounded-lg border border-border bg-surface p-6 sm:p-10 lg:grid-cols-12 lg:gap-12 lg:p-12"
+            className="mt-14 rounded-lg border border-border bg-surface p-6 sm:p-10 lg:p-12"
           >
-            <div className="lg:col-span-5">
-              <ProjectCopy showcase={featured} name={featuredProject.name} size="lg" />
-            </div>
-
             <Link
               href={`/projetos/${featured.slug}`}
               aria-label={`Ver case: ${featuredProject.name}`}
-              className="lg:col-span-7"
+              className="group block"
             >
-              <FramedVisual
+              <ScreenshotFrame
                 screenshot={featuredProject.cover}
                 tone="elevated"
                 priority
-                sizes="(min-width: 1024px) 52vw, 100vw"
+                sizes="(min-width: 1024px) 72rem, 100vw"
               />
             </Link>
+
+            <div className="mt-10">
+              <ProjectCopy showcase={featured} name={featuredProject.name} size="lg" />
+            </div>
           </Reveal>
         ) : null}
 

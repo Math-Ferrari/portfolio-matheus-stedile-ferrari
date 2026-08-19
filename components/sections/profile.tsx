@@ -4,10 +4,11 @@ import { profile } from "@/data/site";
 
 /**
  * Quem sou — a única apresentação do corpo da home, feita para ser entendida
- * em segundos. O heading fica largo de propósito (`max-w-[62.5rem]`, ~1000px
- * no desktop): a hero já é uma coluna central estreita, e uma frase curta
- * apertada na mesma largura quebra em mais linhas do que precisa. Sem
- * eyebrow, sem número de seção — a escala tipográfica já organiza a leitura.
+ * em segundos. Heading e parágrafo ficam largos de propósito
+ * (`max-w-[62.5rem]`/`max-w-[64ch]`): a hero já é uma coluna central
+ * estreita, e conteúdo curto apertado na mesma largura quebra em mais linhas
+ * do que precisa ou lê como um bloco espremido. Sem eyebrow, sem número de
+ * seção — a escala tipográfica já organiza a leitura.
  */
 export function Profile() {
   return (
@@ -18,9 +19,7 @@ export function Profile() {
             {profile.heading}
           </h2>
 
-          <p className="mt-8 max-w-[46ch] text-body-lg text-foreground">{profile.lead}</p>
-
-          <p className="mt-4 max-w-[48ch] text-sm text-muted">{profile.detail}</p>
+          <p className="mt-8 max-w-[64ch] text-body-lg text-foreground">{profile.body}</p>
         </Reveal>
       </Container>
     </section>
