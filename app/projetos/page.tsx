@@ -20,7 +20,7 @@ export default function ProjectsPage() {
         <div className="grid gap-x-10 gap-y-7 lg:grid-cols-12">
           <div className="lg:col-span-3 xl:col-span-2">
             <p className="rise rise-1 flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
-              <span aria-hidden className="h-px w-6 bg-accent-blue" />
+              <span aria-hidden className="h-px w-6 bg-accent" />
               Projetos
             </p>
           </div>

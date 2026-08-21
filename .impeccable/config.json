@@ -1,0 +1,134 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "#ffffff",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-08-20T14:54:39.826Z",
+        "reason": "::selection text color paired with --accent-strong background, verified >=4.5:1 in both themes during the green re-theme contrast audit; not drift"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.05rem",
+        "files": [
+          "components/hero/interactive-hero.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:47.768Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.15rem",
+        "files": [
+          "components/hero/interactive-hero.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:47.861Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "files": [
+          "components/hero/interactive-hero.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:47.957Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.68rem",
+        "files": [
+          "components/hero/about-intro.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.058Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.62rem",
+        "files": [
+          "components/hero/about-intro.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.164Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.65rem",
+        "files": [
+          "components/hero/about-intro.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.265Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.88rem",
+        "files": [
+          "components/hero/about-intro.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.360Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "files": [
+          "components/hero/about-intro.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.468Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "files": [
+          "components/ui/brand-signature.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.569Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "files": [
+          "components/ui/action-link.tsx"
+        ],
+        "createdAt": "2026-08-20T14:54:48.669Z",
+        "reason": "Pre-existing arbitrary UI micro-typography (fine chrome text), predates this session's color-only re-theme task; not part of DESIGN.md's documented content type ramp by design"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2.1rem",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-08-21T02:32:09.781Z",
+        "reason": "Scoped max-height:820px override of #profile-title's own hero size (2.35rem base), not a new type step -- clamp floor trimmed for short-viewport header clearance (see comment above the rule)"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.68rem",
+        "createdAt": "2026-08-21T12:41:16.670Z",
+        "reason": "matches precedent already in components/hero/about-intro.tsx (01/Perfil label, portrait caption) — same micro-label scale, reused per user request to match Hero language"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.7rem",
+        "createdAt": "2026-08-21T12:41:16.804Z",
+        "reason": "matches precedent in components/hero/language-toggle.tsx — same micro-label scale"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "createdAt": "2026-08-21T12:41:16.898Z",
+        "reason": "matches precedent in components/ui/action-link.tsx, interactive-hero.tsx, site-header.tsx, brand-signature.tsx — the site's established CTA/body text size"
+      }
+    ]
+  }
+}

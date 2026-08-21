@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <Container className="flex min-h-[60vh] flex-col justify-center py-section">
       <p className="flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
-        <span aria-hidden className="h-px w-6 bg-accent-blue" />
+        <span aria-hidden className="h-px w-6 bg-accent" />
         Erro 404
       </p>
       <h1 className="mt-6 max-w-[16ch] text-heading-xl font-medium text-foreground">

@@ -1,162 +1,182 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 import { ScreenshotFrame } from "@/components/projects/screenshot";
-import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
 import { getProject, selectedProjects } from "@/data/projects";
-import { cn } from "@/lib/utils";
+import type { Project } from "@/lib/types";
+import { cn, toIndexLabel } from "@/lib/utils";
 
 type Showcase = (typeof selectedProjects)[number];
 
 /**
- * Bloco de texto compartilhado pelos três projetos — mesma ordem de leitura
- * (categoria → nome → descrição → palavras-chave → CTA) em todos, para a
- * seção ler como um sistema. O que muda entre eles é a ESCALA e a
- * composição ao redor, não a estrutura da informação. Palavras-chave sempre
- * numa linha só, separadas por "·" — nunca pill.
+ * Card = módulo editorial horizontal, não card de dashboard em coluna. Um
+ * único `<Link>` cobre o card inteiro (ver nota de acessibilidade abaixo) e
+ * é um grid de 12 colunas no desktop: conteúdo nas colunas 1–5, imagem nas
+ * 6–12 — o MESMO eixo que `about-intro.tsx` já usa na hero (texto à
+ * esquerda, retrato à direita), para os dois lugares lerem como o mesmo
+ * produto. Nenhum card inverte esse lado: alternar por linha criaria um
+ * zigue-zague que não existe em nenhum outro lugar do site.
+ *
+ * A imagem não tem proporção fixa no desktop (`lg:aspect-auto`) — ela
+ * preenche a altura que o grid resolve a partir do conteúdo (CSS Grid
+ * `align-items: stretch`, o padrão), então a screenshot participa da
+ * composição horizontal em vez de ser um topo de card com altura própria.
+ * No mobile, sem uma linha para esticar contra, ela volta a ter proporção
+ * própria (`aspect-[4/3]`) para não colapsar a 0px de altura.
+ *
+ * Fundo/borda/hover reaproveitam exatamente o sistema da iteração anterior
+ * (opacidade fracionária de `--surface` sobre `bg-tone-navy`, mesma técnica
+ * da cápsula do `SiteHeader`) — só a topologia do card mudou, não a
+ * linguagem de cor/motion.
  */
-function ProjectCopy({
+function ProjectCard({
   showcase,
-  name,
-  size,
+  project,
+  index,
+  principal = false,
+  delay = 0,
 }: {
   showcase: Showcase;
-  name: string;
-  size: "lg" | "md" | "sm";
+  project: Project;
+  index: number;
+  principal?: boolean;
+  delay?: number;
 }) {
   const href = `/projetos/${showcase.slug}`;
+  const indexLabel = toIndexLabel(index);
 
   return (
-    <div>
-      <p className="text-caption font-medium uppercase tracking-[0.18em] text-accent-blue">
-        {showcase.category}
-      </p>
-
-      <h3
+    <Reveal delay={delay}>
+      <Link
+        href={href}
+        aria-label={`${showcase.cta}: ${project.name}`}
         className={cn(
-          "text-balance-title mt-4 font-medium text-foreground",
-          size === "lg" && "text-heading-xl",
-          size === "md" && "text-heading-lg",
-          size === "sm" && "text-heading-md",
+          "group grid grid-cols-1 overflow-hidden rounded-lg border transition-[transform,background-color,border-color] duration-300 ease-out hover:-translate-y-1 focus-visible:-translate-y-1 lg:grid-cols-12 lg:items-stretch lg:min-h-[27rem]",
+          principal
+            ? "border-border bg-surface/[0.65] hover:border-foreground/25 hover:bg-surface/[0.92]"
+            : "border-border/70 bg-surface/[0.45] hover:border-foreground/20 hover:bg-surface/[0.8]",
         )}
       >
-        <Link href={href} className="transition-colors duration-200 hover:text-accent-blue">
-          {name}
-        </Link>
-      </h3>
+        <div className="order-2 flex flex-col justify-center p-6 sm:p-8 lg:order-1 lg:col-span-5 lg:p-11 xl:p-12">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="nums-tabular text-[0.68rem] font-medium uppercase tracking-[0.2em] text-foreground/40 transition-colors duration-300 ease-out group-hover:text-foreground/60 group-focus-visible:text-foreground/60">
+              {indexLabel} / {showcase.category}
+            </span>
+            {principal ? (
+              <span className="ml-auto shrink-0 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-accent">
+                Case principal
+              </span>
+            ) : null}
+          </div>
 
-      <p className={cn("mt-4 max-w-[52ch] text-muted", size === "lg" && "text-body-lg")}>
-        {showcase.description}
-      </p>
+          <h3
+            className={cn(
+              "mt-4 leading-snug text-foreground",
+              principal ? "text-heading-xl font-medium" : "text-heading-lg font-medium",
+            )}
+          >
+            {project.name}
+          </h3>
 
-      <p className="mt-4 max-w-[52ch] text-sm text-muted">{showcase.keywords.join(" · ")}</p>
+          <p className="mt-4 line-clamp-3 max-w-[46ch] text-sm leading-relaxed text-muted sm:text-base">
+            {showcase.description}
+          </p>
 
-      <ActionLink href={href} variant="quiet" className="mt-7">
-        {showcase.slug === "sistema-platotruck" ? "Ver case" : "Ver projeto"}
-      </ActionLink>
-    </div>
+          <p className="mt-5 line-clamp-2 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-muted/70">
+            {showcase.keywords.join(" · ")}
+          </p>
+
+          <span className="mt-7 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-foreground transition-colors duration-300 ease-out group-hover:text-accent group-focus-visible:text-accent">
+            <span className="border-b border-border pb-0.5 transition-colors duration-300 ease-out group-hover:border-accent group-focus-visible:border-accent">
+              {showcase.cta}
+            </span>
+            <ArrowUpRight
+              aria-hidden
+              className="size-4 text-muted transition-[transform,color] duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-1 group-hover:text-accent-strong group-focus-visible:-translate-y-0.5 group-focus-visible:translate-x-1 group-focus-visible:text-accent-strong"
+              strokeWidth={1.75}
+            />
+          </span>
+        </div>
+
+        <div className="relative order-1 overflow-hidden lg:order-2 lg:col-span-7">
+          <ScreenshotFrame
+            screenshot={project.cover}
+            tone="elevated"
+            bare
+            priority={principal}
+            aspectClassName="aspect-[4/3] lg:aspect-auto"
+            className="h-full"
+            sizes="(min-width: 1024px) 58vw, 100vw"
+          />
+          {/* Mobile: imagem no topo, fade na base pra dentro do conteúdo. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-tone-navy/80 to-transparent lg:hidden"
+          />
+          {/* Desktop: imagem à direita, fade na borda interna (esquerda)
+              pra dentro do conteúdo — mesma ideia, direção que muda com o
+              eixo do card. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 hidden w-16 bg-gradient-to-r from-tone-navy/70 to-transparent lg:block"
+          />
+        </div>
+      </Link>
+    </Reveal>
   );
 }
 
 /**
- * Projetos selecionados — três projetos, três pesos visuais explícitos. A
- * hierarquia é a mensagem: o primeiro ocupa a largura inteira, com a
- * screenshot grande em cima e o texto abaixo; os outros dois dividem a linha
- * seguinte em 7/12 e 5/12, na mesma composição (imagem em cima, texto
- * embaixo), só em escala menor. Ninguém precisa ler para saber qual é o
- * projeto principal.
+ * Projetos selecionados — três módulos horizontais empilhados (uma "vitrine
+ * de cases" editorial) em vez do grid de 3 colunas anterior. Cabeçalho
+ * (título + índice "01—03" + filete) inalterado — já funcionava. O Sistema
+ * de Gestão PlatoTruck continua primeiro e ganha destaque só por ordem,
+ * rótulo "Case principal" e um heading um degrau maior — nunca por um card
+ * de proporções diferentes dos outros dois.
  *
- * As três screenshots são reais (`public/1.png`, `4.png`, `5.png`) — sem
- * moldura artificial ao redor: `ScreenshotFrame` só dá uma superfície e um
- * radius discretos, na proporção original da imagem (nunca cortada). A
- * hierarquia vem de espaço, superfície e escala, não de decoração.
+ * Sem `h-full`/grid-stretch entre os TRÊS cards (diferente da versão
+ * anterior): cada linha tem sua própria altura natural, o que é esperado
+ * numa lista editorial — não é mais uma grade onde os três precisam ocupar
+ * exatamente a mesma caixa.
  */
 export function SelectedProjects() {
-  const [featured, wide, narrow] = selectedProjects;
-  const featuredProject = getProject(featured.slug);
-  const wideProject = getProject(wide.slug);
-  const narrowProject = getProject(narrow.slug);
-
   return (
     <section id="projetos" className="bg-tone-navy">
       <Container className="py-section">
         <Reveal>
-          <h2 className="text-heading-xl font-medium text-foreground">Projetos selecionados</h2>
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-border pb-6 sm:pb-8">
+            <h2 className="text-heading-xl font-medium text-foreground">
+              Projetos selecionados
+            </h2>
+            <span
+              aria-hidden
+              className="nums-tabular text-caption font-medium uppercase tracking-[0.2em] text-muted"
+            >
+              01—03
+            </span>
+          </div>
         </Reveal>
 
-        {/* 1º — largura inteira, screenshot grande em cima, texto embaixo. */}
-        {featuredProject ? (
-          <Reveal
-            delay={80}
-            className="mt-14 rounded-lg border border-border bg-surface p-6 sm:p-10 lg:p-12"
-          >
-            <Link
-              href={`/projetos/${featured.slug}`}
-              aria-label={`Ver case: ${featuredProject.name}`}
-              className="group block"
-            >
-              <ScreenshotFrame
-                screenshot={featuredProject.cover}
-                tone="elevated"
-                priority
-                sizes="(min-width: 1024px) 72rem, 100vw"
+        <div className="mt-10 flex flex-col gap-6 sm:mt-12 lg:gap-8">
+          {selectedProjects.map((showcase, index) => {
+            const project = getProject(showcase.slug);
+            if (!project) {
+              return null;
+            }
+
+            return (
+              <ProjectCard
+                key={showcase.slug}
+                showcase={showcase}
+                project={project}
+                index={index}
+                principal={project.featured}
+                delay={index * 80}
               />
-            </Link>
-
-            <div className="mt-10">
-              <ProjectCopy showcase={featured} name={featuredProject.name} size="lg" />
-            </div>
-          </Reveal>
-        ) : null}
-
-        {/* 2º e 3º — mesma linha, larguras deliberadamente desiguais.
-            `items-start` (em vez do stretch padrão do grid) deixa cada um com
-            a altura do próprio conteúdo: o terceiro fica visivelmente menor
-            também na vertical, em vez de esticar e sobrar espaço morto. */}
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-12">
-          {wideProject ? (
-            <Reveal className="rounded-lg border border-border bg-surface p-6 sm:p-10 lg:col-span-7">
-              <Link
-                href={`/projetos/${wide.slug}`}
-                aria-label={`Ver projeto: ${wideProject.name}`}
-                className="group block"
-              >
-                <ScreenshotFrame
-                  screenshot={wideProject.cover}
-                  tone="elevated"
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                />
-              </Link>
-
-              <div className="mt-8">
-                <ProjectCopy showcase={wide} name={wideProject.name} size="md" />
-              </div>
-            </Reveal>
-          ) : null}
-
-          {narrowProject ? (
-            <Reveal
-              delay={80}
-              className="rounded-lg border border-border bg-surface p-6 sm:p-10 lg:col-span-5"
-            >
-              <Link
-                href={`/projetos/${narrow.slug}`}
-                aria-label={`Ver projeto: ${narrowProject.name}`}
-                className="group block"
-              >
-                <ScreenshotFrame
-                  screenshot={narrowProject.cover}
-                  tone="elevated"
-                  sizes="(min-width: 1024px) 28vw, 100vw"
-                />
-              </Link>
-
-              <div className="mt-8">
-                <ProjectCopy showcase={narrow} name={narrowProject.name} size="sm" />
-              </div>
-            </Reveal>
-          ) : null}
+            );
+          })}
         </div>
       </Container>
     </section>

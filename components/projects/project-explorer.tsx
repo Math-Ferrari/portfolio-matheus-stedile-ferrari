@@ -42,7 +42,7 @@ export function ProjectExplorer({ projects }: ProjectExplorerProps) {
                 onFocus={() => setActive(index)}
                 className={cn(
                   "group flex items-baseline justify-between gap-6 py-6 transition-colors duration-200",
-                  index === active ? "text-accent-blue" : "text-foreground hover:text-accent-blue",
+                  index === active ? "text-accent" : "text-foreground hover:text-accent",
                 )}
               >
                 <span className="flex items-baseline gap-5">
@@ -53,7 +53,7 @@ export function ProjectExplorer({ projects }: ProjectExplorerProps) {
                 </span>
                 <ArrowUpRight
                   aria-hidden
-                  className="size-5 shrink-0 text-accent-red opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+                  className="size-5 shrink-0 text-accent-strong opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
                   strokeWidth={1.75}
                 />
               </Link>

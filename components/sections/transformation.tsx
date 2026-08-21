@@ -45,7 +45,7 @@ export function Transformation() {
           </div>
 
           <Reveal delay={110}>
-            <p className="text-caption font-medium uppercase tracking-[0.18em] text-accent-blue">
+            <p className="text-caption font-medium uppercase tracking-[0.18em] text-accent">
               {block.after.label}
             </p>
             <ul className="mt-5 space-y-3.5">

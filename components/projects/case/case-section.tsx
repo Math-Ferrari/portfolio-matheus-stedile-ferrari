@@ -22,7 +22,7 @@ export function CaseSection({
     <section id={id} className={cn("scroll-mt-24 border-t border-border pt-7", className)}>
       <p
         aria-hidden
-        className="nums-tabular text-caption font-semibold tracking-[0.12em] text-accent-blue"
+        className="nums-tabular text-caption font-semibold tracking-[0.12em] text-accent"
       >
         {index}
       </p>

@@ -93,11 +93,10 @@ uniform vec3 uBaseColor;
  * pura e passa a maior parte do tempo misturada com uBaseColor.
  *
  * Sobre preto (dark) isso já lê bem: misturar pouco com preto só escurece a
- * cor, sem lavar o matiz. Sobre off-white (light) o mesmo mix baixo lava a
- * cor para pastel — e um vermelho pouco saturado sobre branco é, por
- * definição, rosa. uColorBoost escala \`col\` (mesma direção/matiz, já que é
- * um escalar uniforme) só para aproximar mais pixels de glowMask = 1 — o
- * NÚCLEO passa a carregar a cor cheia por um raio maior; a cauda (halo)
+ * cor, sem lavar o matiz. Sobre off-white (light) o mesmo mix baixo lava
+ * qualquer matiz para pastel. uColorBoost escala \`col\` (mesma direção/matiz,
+ * já que é um escalar uniforme) só para aproximar mais pixels de glowMask = 1
+ * — o NÚCLEO passa a carregar a cor cheia por um raio maior; a cauda (halo)
  * mantém a mesma curva de queda, só cruza o teto de saturação mais cedo.
  * Não pode estourar além da própria cor (glowMask segue clampado em 1), então
  * não vira neon/HDR. Default 1.0 reproduz exatamente o comportamento
@@ -108,15 +107,55 @@ uniform float uColorBoost;
 /**
  * Multiplicador extra só do wave "top" (soma-se a uColorBoost, não o
  * substitui). Existe porque "top" já nasce com peso 0.1 no acúmulo de col
- * (dez vezes mais fraco que "middle") — é o único wave que carrega vermelho
- * (ver themed-floating-lines.tsx), então mesmo com uColorBoost alto seu pico
- * continua muito abaixo de glowMask = 1. Sobre off-white isso não lê como
- * "vermelho fraco": um vermelho pouco saturado misturado com branco É rosa,
- * por definição — não tem como corrigir isso escalando todo mundo igual,
- * porque "middle"/"bottom" (azuis) já saturam bem antes de "top" chegar
- * perto. Default 1.0 (sem efeito; dark mode não usa isto).
+ * (dez vezes mais fraco que "middle") — mesmo com uColorBoost alto seu pico
+ * continua muito abaixo de glowMask = 1, então sobre off-white ele lava para
+ * pastel antes de "middle"/"bottom" (mais fortes) saturarem. Default 1.0
+ * (sem efeito; dark mode não usa isto — ver themed-floating-lines.tsx).
  */
 uniform float uTopBoost;
+
+/**
+ * Terceiro acréscimo: 0..1, escrito pelo componente pai a partir do scroll
+ * (ver a prop "progress" em hero-transition.tsx) — o shader não lê o DOM nem
+ * sabe o que é "scroll", só recebe este número já pronto. Default 0.0
+ * reproduz exatamente o comportamento original (sem esta prop, nada muda).
+ * Dois efeitos, os dois puramente aditivos:
+ *
+ * (1) Convergência: em vez de misturar geometria/waves de verdade (exigiria
+ * reescrever wave()), cada família desloca seu offset vertical
+ * (*WavePosition.y) em direção ao mesmo alvo (CONVERGE_Y) — como as três já
+ * têm rotações/amplitudes diferentes, aproximar só a origem já basta para a
+ * leitura de "estão sendo puxadas para o mesmo lugar", sem precisar tocar em
+ * wave() nem nos gradientes.
+ *
+ * (2) Impacto: um bump pequeno e temporário de brilho perto do fim do range
+ * de convergência (ver "impact" em mainImage) — não estoura além da cor
+ * (mesmo clamp de glowMask de sempre), então não vira flash/neon.
+ */
+uniform float uScrollProgress;
+
+/**
+ * Quarto acréscimo: 0..1, também aditivo (default 1.0 = sem efeito). Escala
+ * "col" (a soma das linhas) igual uColorBoost, mas para o sentido oposto —
+ * BAIXAR a magnitude, não subir. Existe para a transição da hero: conforme a
+ * próxima seção nasce e cresce por cima (ver mask em hero-transition.tsx),
+ * as linhas precisam ficar progressivamente mais fracas, como se estivessem
+ * sendo absorvidas pela nova superfície, não só cobertas por ela. Como
+ * glowMask já é clamp(length(col), 0, 1), reduzir a magnitude empurra o
+ * pixel de volta para uBaseColor de forma suave — o mesmo mecanismo do
+ * boost, invertido.
+ */
+uniform float uLinesFade;
+
+/**
+ * Quinto acréscimo: 0..1, aditivo (default 0.0 = sem efeito). Empurra o
+ * offset horizontal de "bottom"/"top" para longe do centro (sentidos
+ * opostos) — "middle" fica parado, é o eixo de referência. Junto com
+ * uLinesFade (que já cai a zero na mesma janela, escolhida por quem chama),
+ * dá a leitura de "as linhas estão saindo pelas laterais enquanto
+ * desaparecem", sem precisar reescrever wave()/geometria.
+ */
+uniform float uLinesExit;
 
 const vec3 BLACK = vec3(0.0);
 const vec3 PINK  = vec3(233.0, 71.0, 245.0) / 255.0;
@@ -199,6 +238,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     mouseUv.y *= -1.0;
   }
 
+  /* Alvo comum de convergência (ver uScrollProgress acima) — centro vertical
+     do canvas em baseUv, não uma posição arbitrária. Em uScrollProgress = 0
+     cada mix() devolve exatamente *WavePosition.y (sem efeito). */
+  const float CONVERGE_Y = 0.0;
+  float bottomY = mix(bottomWavePosition.y, CONVERGE_Y, uScrollProgress);
+  float middleY = mix(middleWavePosition.y, CONVERGE_Y, uScrollProgress);
+  float topY    = mix(topWavePosition.y, CONVERGE_Y, uScrollProgress);
+
+  /* Saída lateral (ver uLinesExit acima) — sentidos opostos para bottom/top
+     abrirem para fora; middle fica no eixo, sem deslocamento. */
+  const float EXIT_SPREAD = 1.6;
+  float bottomX = bottomWavePosition.x - uLinesExit * EXIT_SPREAD;
+  float topX    = topWavePosition.x + uLinesExit * EXIT_SPREAD;
+
   if (enableBottom) {
     for (int i = 0; i < bottomLineCount; ++i) {
       float fi = float(i);
@@ -208,7 +261,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
       float angle = bottomWavePosition.z * log(length(baseUv) + 1.0);
       vec2 ruv = baseUv * rotate(angle);
       col += lineCol * wave(
-        ruv + vec2(bottomLineDistance * fi + bottomWavePosition.x, bottomWavePosition.y),
+        ruv + vec2(bottomLineDistance * fi + bottomX, bottomY),
         1.5 + 0.2 * fi,
         baseUv,
         mouseUv,
@@ -226,7 +279,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
       float angle = middleWavePosition.z * log(length(baseUv) + 1.0);
       vec2 ruv = baseUv * rotate(angle);
       col += lineCol * wave(
-        ruv + vec2(middleLineDistance * fi + middleWavePosition.x, middleWavePosition.y),
+        ruv + vec2(middleLineDistance * fi + middleWavePosition.x, middleY),
         2.0 + 0.15 * fi,
         baseUv,
         mouseUv,
@@ -245,7 +298,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
       vec2 ruv = baseUv * rotate(angle);
       ruv.x *= -1.0;
       col += lineCol * wave(
-        ruv + vec2(topLineDistance * fi + topWavePosition.x, topWavePosition.y),
+        ruv + vec2(topLineDistance * fi + topX, topY),
         1.0 + 0.2 * fi,
         baseUv,
         mouseUv,
@@ -265,7 +318,17 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
      de exibicao do original já fazia. Com uBaseColor claro, a mesma conta
      funciona sem lavar a cor: a cauda (magnitude baixa) fica quase toda
      fundo, o nucleo (magnitude alta) satura na cor cheia da linha. */
-  col *= uColorBoost;
+  /* Bump de brilho perto do fim da convergência (uScrollProgress -> 1): sobe
+     e desce como um triângulo, pico em 0.85 — "momento de impacto" (ver
+     hero-transition.tsx), não um estado permanente. clamp() dos dois lados
+     garante que nunca fica negativo fora do range. Continua sujeito ao mesmo
+     clamp de glowMask abaixo, então não estoura além da própria cor. */
+  float impactRise = smoothstep(0.55, 0.85, uScrollProgress);
+  float impactFall = smoothstep(0.85, 1.0, uScrollProgress);
+  float impact = impactRise * (1.0 - impactFall);
+  col *= 1.0 + 0.15 * impact;
+
+  col *= uColorBoost * uLinesFade;
   float glowLength = length(col);
   float glowMask = clamp(glowLength, 0.0, 1.0);
   vec3 lineHue = col / max(glowLength, 1e-5);
@@ -347,11 +410,46 @@ export type FloatingLinesProps = {
   colorBoost?: number;
   /**
    * Multiplicador extra só do wave `top` (ver `uTopBoost` no shader) — o
-   * único que carrega vermelho na composição atual, e o único com peso tão
-   * baixo (0.1) que `colorBoost` sozinho não é suficiente para tirá-lo do
-   * pastel. Default `1` reproduz o comportamento original.
+   * único com peso tão baixo (0.1) que `colorBoost` sozinho não é
+   * suficiente para tirá-lo do pastel sobre um fundo claro. Default `1`
+   * reproduz o comportamento original.
    */
   topBoost?: number;
+  /**
+   * 0..1, lido a cada frame do loop de render já existente (ver `uniforms.
+   * uScrollProgress.value = progress?.current ?? 0` abaixo) — nunca via prop
+   * simples, que forçaria um re-render React por frame. Um `ref` porque só
+   * quem chama sabe calcular isto (normalmente a partir do scroll, via
+   * `hero-transition.tsx`); o shader não acopla com o DOM/Lenis, só lê o
+   * número. Ausente = sempre 0 = comportamento idêntico ao atual.
+   */
+  progress?: React.RefObject<number>;
+  /**
+   * 0..1, mesmo mecanismo de `progress` (ref, lido no loop de render, nunca
+   * uma prop reativa) — ver `uLinesFade` no shader. `1` (default, também o
+   * valor quando a ref está ausente) reproduz o comportamento atual sem
+   * nenhum efeito; valores menores apagam as linhas em direção a
+   * `baseColor`, para a "absorção" pela próxima seção durante a transição.
+   */
+  linesFade?: React.RefObject<number>;
+  /**
+   * 0..1, mesmo mecanismo — ver `uLinesExit` no shader. `0` (default,
+   * também o valor quando a ref está ausente) reproduz o comportamento
+   * atual; valores maiores abrem "bottom"/"top" para as laterais.
+   */
+  linesExit?: React.RefObject<number>;
+  /**
+   * Cor (hex) para onde `uBaseColor` deve migrar ao longo de `baseColorMorph`
+   * — pensado para a hero herdar visualmente a superfície da PRÓXIMA seção
+   * perto do fim da transição (ver hero-transition.tsx), sem costura entre
+   * o canvas (WebGL, sempre opaco onde não há linha) e o CSS ao redor dele.
+   * Ausente = `uBaseColor` fica fixo em `baseColor`, exatamente como hoje —
+   * só quando os dois props (`baseColorTo` + `baseColorMorph`) existem é que
+   * o loop de render passa a recalcular `uBaseColor` a cada frame.
+   */
+  baseColorTo?: string;
+  /** 0..1 — o quanto migrar de `baseColor` para `baseColorTo`. Ver `baseColorTo`. */
+  baseColorMorph?: React.RefObject<number>;
 };
 
 export default function FloatingLines({
@@ -373,6 +471,11 @@ export default function FloatingLines({
   baseColor = "#000000",
   colorBoost = 1,
   topBoost = 1,
+  progress,
+  linesFade,
+  linesExit,
+  baseColorTo,
+  baseColorMorph,
 }: FloatingLinesProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetMouseRef = useRef(new Vector2(-1000, -1000));
@@ -474,7 +577,16 @@ export default function FloatingLines({
       uBaseColor: { value: hexToVec3(baseColor) },
       uColorBoost: { value: colorBoost },
       uTopBoost: { value: topBoost },
+      uScrollProgress: { value: progress?.current ?? 0 },
+      uLinesFade: { value: linesFade?.current ?? 1 },
+      uLinesExit: { value: linesExit?.current ?? 0 },
     };
+
+    // Extremos do morph de uBaseColor (ver o comentário de `baseColorTo` na
+    // prop) — calculados uma vez aqui, não a cada frame; só `renderLoop`
+    // interpola entre eles usando `baseColorMorph.current`.
+    const baseColorFromVec = hexToVec3(baseColor);
+    const baseColorToVec = baseColorTo ? hexToVec3(baseColorTo) : null;
 
     if (linesGradient && linesGradient.length > 0) {
       const stops = linesGradient.slice(0, MAX_GRADIENT_STOPS);
@@ -573,6 +685,20 @@ export default function FloatingLines({
       }
 
       uniforms.iTime.value = clock.getElapsedTime();
+      uniforms.uScrollProgress.value = progress?.current ?? 0;
+      uniforms.uLinesFade.value = linesFade?.current ?? 1;
+      uniforms.uLinesExit.value = linesExit?.current ?? 0;
+
+      if (baseColorToVec) {
+        const raw = baseColorMorph?.current ?? 0;
+        const m = raw < 0 ? 0 : raw > 1 ? 1 : raw;
+        const target = uniforms.uBaseColor.value as Vector3;
+        target.set(
+          baseColorFromVec.x + (baseColorToVec.x - baseColorFromVec.x) * m,
+          baseColorFromVec.y + (baseColorToVec.y - baseColorFromVec.y) * m,
+          baseColorFromVec.z + (baseColorToVec.z - baseColorFromVec.z) * m,
+        );
+      }
 
       if (interactive) {
         currentMouseRef.current.lerp(targetMouseRef.current, mouseDamping);
@@ -639,6 +765,7 @@ export default function FloatingLines({
   }, [
     linesGradient,
     baseColor,
+    baseColorTo,
     colorBoost,
     topBoost,
     enabledWaves,
@@ -654,6 +781,10 @@ export default function FloatingLines({
     mouseDamping,
     parallax,
     parallaxStrength,
+    // `progress`/`linesFade`/`linesExit`/`baseColorMorph` ficam de fora de
+    // propósito: são refs lidos a cada frame em `renderLoop` (via
+    // `.current`), não valores reativos — colocá-los aqui recriaria o
+    // WebGLRenderer inteiro a cada troca de progresso.
   ]);
 
   return (

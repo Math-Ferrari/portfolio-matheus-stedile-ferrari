@@ -70,8 +70,8 @@ export const viewport: Viewport = {
      manual em runtime, que exigiria reescrever a tag a cada clique — o tipo
      de complicação que a tarefa pediu para evitar se não for essencial. */
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f2ea" },
-    { media: "(prefers-color-scheme: dark)", color: "#050505" },
+    { media: "(prefers-color-scheme: light)", color: "#f2efe8" },
+    { media: "(prefers-color-scheme: dark)", color: "#11100e" },
   ],
   colorScheme: "light dark",
 };
@@ -130,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <a
           href="#conteudo"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent-blue focus:px-5 focus:py-2 focus:text-sm focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent-strong focus:px-5 focus:py-2 focus:text-sm focus:text-white"
         >
           Pular para o conteúdo
         </a>

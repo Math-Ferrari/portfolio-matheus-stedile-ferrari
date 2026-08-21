@@ -29,17 +29,17 @@ export function LanguageToggle({ className }: { className?: string }) {
     <div
       role="group"
       aria-label="Idioma (em breve)"
-      className={cn("flex items-center gap-1.5 text-[0.7rem] font-medium tracking-[0.02em]", className)}
+      className={cn("flex items-center text-[0.7rem] font-medium tracking-[0.02em]", className)}
     >
       {LANGUAGES.map((lang, index) => (
-        <div key={lang} className="flex items-center gap-1.5">
-          {index > 0 ? <span aria-hidden className="text-muted">/</span> : null}
+        <div key={lang} className="flex items-center">
+          {index > 0 ? <span aria-hidden className="-mx-1 text-muted">/</span> : null}
           <button
             type="button"
             onClick={() => setActive(lang)}
             aria-pressed={active === lang}
             className={cn(
-              "rounded-sm px-0.5 transition-colors duration-200",
+              "inline-flex min-h-11 min-w-8 items-center justify-center transition-colors duration-200",
               active === lang ? "text-foreground" : "text-muted hover:text-foreground/80",
             )}
           >

@@ -34,6 +34,15 @@ type FrameProps = {
   /** Sem borda e sem cantos próprios — para preencher a área de um card. */
   bare?: boolean;
   className?: string;
+  /**
+   * Força proporção fixa (`object-cover`) mesmo quando a screenshot tem
+   * `width`/`height` reais — para grids onde todos os cards precisam da
+   * MESMA altura de imagem (ex.: "Projetos selecionados"), independente da
+   * proporção nativa de cada captura. Sem isto (o padrão), uma screenshot
+   * com dimensão conhecida usa sua PRÓPRIA proporção — o certo para cases,
+   * onde a imagem é o conteúdo principal e não pode cortar nada.
+   */
+  aspectClassName?: string;
 };
 
 /**
@@ -54,9 +63,11 @@ export function ScreenshotFrame({
   tone = "elevated",
   bare = false,
   className,
+  aspectClassName,
 }: FrameProps) {
   const frame = screenshot.frame ?? "desktop";
-  const hasNaturalSize = Boolean(screenshot.src && screenshot.width && screenshot.height);
+  const hasNaturalSize =
+    Boolean(screenshot.src && screenshot.width && screenshot.height) && !aspectClassName;
 
   if (hasNaturalSize) {
     return (
@@ -87,7 +98,7 @@ export function ScreenshotFrame({
         "relative w-full overflow-hidden",
         bare ? "rounded-none" : "rounded-md border",
         frameByTone[tone],
-        frameAspect[frame],
+        aspectClassName ?? frameAspect[frame],
         className,
       )}
     >

@@ -9,11 +9,11 @@ import { Menu, X } from "lucide-react";
 import { LanguageToggle } from "@/components/hero/language-toggle";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Container } from "@/components/ui/container";
-import { nav } from "@/data/site";
+import { nav, site } from "@/data/site";
 import { cn } from "@/lib/utils";
 
 /** Altura do header — usada para recortar a faixa observada sobre a capa. */
-const HEADER_HEIGHT = 64;
+const HEADER_HEIGHT = 56;
 
 /**
  * Header único e global — o mesmo componente, os mesmos links, na mesma
@@ -33,7 +33,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const lenis = useLenis();
 
-  /** A capa só existe na home; nas demais rotas o header já nasce com fundo. */
+  /** A capa só existe na home; este estado serve apenas ao reforço de contraste. */
   const hasCover = pathname === "/";
 
   /**
@@ -62,8 +62,8 @@ export function SiteHeader() {
   }, []);
 
   /**
-   * Só importa para decidir se o header começa transparente (sobre a capa) ou
-   * já nasce com o fundo da página (rotas sem capa). Quem escreve o estado é
+   * Observa a capa para aplicar um reforço tipográfico sutil enquanto o vidro
+   * mais transparente estiver sobre o Floating Lines. Quem escreve o estado é
    * sempre o callback do observer — o caso "não há capa" é resolvido por
    * `hasCover`, não por um reset dentro do efeito.
    *
@@ -87,108 +87,99 @@ export function SiteHeader() {
   }, [pathname]);
 
   const overHero = hasCover && coverVisible;
-  // A superfície (fundo translúcido + blur + filete) entra ao rolar ou com o
-  // menu aberto — parado no topo da capa o header fica transparente.
+  // A superfície ganha um pouco mais de presença ao rolar ou com o menu
+  // aberto, sem deixar de revelar o conteúdo que passa atrás dela.
   const hasSurface = scrolled || open;
 
-  /** Sombra sutil na cor do próprio `--background`, só enquanto flutua
-      transparente sobre a capa: reforço de contraste caso alguma linha do
-      FloatingLines passe atrás do texto naquele instante — não é uma cor
-      fixa, acompanha o tema. */
-  const heroLegibility = overHero && !hasSurface ? "drop-shadow-[0_1px_8px_var(--background)]" : "";
+  /** Sombra sutil na cor do próprio `--background`: mais difusa sobre a
+      capa e menor após scroll, quando imagens claras ou escuras podem passar
+      sob os links muted. Não é uma cor fixa e acompanha o tema. */
+  const heroLegibility =
+    overHero && !hasSurface
+      ? "drop-shadow-[0_1px_8px_var(--background)]"
+      : hasSurface
+        ? "drop-shadow-[0_1px_4px_var(--background)]"
+        : "";
 
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b transition-[background-color,border-color] duration-300 ease-out",
+        "fixed inset-x-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 overflow-hidden rounded-2xl border backdrop-blur-[14px] backdrop-saturate-[1.2] transition-[background-color,border-color,backdrop-filter] duration-300 ease-out md:inset-x-[1.125rem] md:top-[calc(env(safe-area-inset-top)+0.875rem)]",
         hasSurface
-          ? "border-border/60 bg-background/80 backdrop-blur-md"
-          : overHero
-            ? "border-transparent bg-transparent"
-            : "border-transparent bg-background",
+          ? "border-border/70 bg-background/[0.5]"
+          : "border-border/50 bg-background/[0.18]",
       )}
     >
-      <Container>
-        <div className="flex h-16 items-center justify-between gap-6">
+      <div className="grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-[clamp(0.75rem,1.2vw,1.25rem)] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-6">
+        <div className="min-w-0 justify-self-start">
           <Link
             href="/"
             onClick={handleHomeClick}
-            aria-label="Portfólio — 2026, ir para a página inicial"
+            aria-label={`${site.name}, ir para a página inicial`}
             aria-current={pathname === "/" ? "page" : undefined}
             className={cn(
-              "shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-foreground/70 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
+              "block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[clamp(0.72rem,0.64rem+0.28vw,0.9rem)] font-medium tracking-[-0.015em] text-foreground/80 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
               heroLegibility,
             )}
           >
-            Portfólio — 2026
+            {site.name}
           </Link>
-
-          {/* `lg` e não `md`: com cinco itens + assinatura + CTA, a barra
-              completa não cabe em larguras de tablet (~820px) — em `md` a
-              navegação quebrava em várias linhas e o CTA saía da tela. */}
-          <nav aria-label="Navegação principal" className="hidden lg:block">
-            <ul className="flex items-center gap-8">
-              {nav.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "relative text-sm text-muted transition-colors duration-200 after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent-blue after:transition-transform after:duration-300 after:ease-out after:content-[''] hover:text-foreground hover:after:scale-x-100",
-                      heroLegibility,
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* CTA, PT/EN, tema e o botão do menu ficam juntos à direita — cada
-              um com sua própria regra de visibilidade: CTA some no mobile
-              (como já era); PT/EN e o tema ficam sempre visíveis, com o mesmo
-              tamanho e alinhamento, para lerem como um único controle. */}
-          <div className="flex shrink-0 items-center gap-5">
-            <Link
-              href="/#contato"
-              className={cn(
-                "hidden rounded-md bg-accent-blue px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 hover:opacity-90 lg:inline-flex",
-                heroLegibility,
-              )}
-            >
-              Vamos conversar
-            </Link>
-
-            <div className={cn("flex items-center gap-3", heroLegibility)}>
-              <LanguageToggle />
-              <ThemeToggle />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setOpen((value) => !value)}
-              aria-expanded={open}
-              aria-controls="menu-mobile"
-              aria-label={open ? "Fechar menu" : "Abrir menu"}
-              className={cn(
-                "-mr-2 inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors duration-200 hover:bg-foreground/10 lg:hidden",
-                heroLegibility,
-              )}
-            >
-              {open ? (
-                <X aria-hidden className="size-5" strokeWidth={1.75} />
-              ) : (
-                <Menu aria-hidden className="size-5" strokeWidth={1.75} />
-              )}
-            </button>
-          </div>
         </div>
-      </Container>
+
+        {/* A coluna central tem largura própria entre duas colunas flexíveis
+            iguais. Assim a navegação permanece no centro geométrico da
+            viewport, independentemente da largura do nome e dos controles. */}
+        <nav aria-label="Navegação principal" className="hidden lg:block">
+          <ul className="flex items-center gap-8">
+            {nav.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "relative text-sm text-muted transition-colors duration-200 after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out after:content-[''] hover:text-foreground hover:after:scale-x-100 focus-visible:text-foreground",
+                    heroLegibility,
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Só os controles compactos ocupam o extremo direito. O CTA continua
+            disponível no menu responsivo, sem competir com "Contato" nem
+            deslocar visualmente a navegação central. */}
+        <div className="flex shrink-0 items-center justify-self-end gap-1">
+          <div className={cn("flex items-center gap-1", heroLegibility)}>
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="menu-mobile"
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            className={cn(
+              "inline-flex size-11 items-center justify-center text-foreground transition-colors duration-200 hover:text-foreground/70 focus-visible:text-foreground lg:hidden",
+              heroLegibility,
+            )}
+          >
+            {open ? (
+              <X aria-hidden className="size-5" strokeWidth={1.75} />
+            ) : (
+              <Menu aria-hidden className="size-5" strokeWidth={1.75} />
+            )}
+          </button>
+        </div>
+      </div>
 
       <div
         id="menu-mobile"
         hidden={!open}
-        className="border-t border-border bg-background lg:hidden"
+        className="border-t border-border/60 bg-transparent lg:hidden"
       >
         <Container>
           <nav aria-label="Navegação principal (mobile)" className="py-3">
@@ -208,7 +199,7 @@ export function SiteHeader() {
                 <Link
                   href="/#contato"
                   onClick={() => setOpen(false)}
-                  className="inline-flex rounded-md bg-accent-blue px-5 py-2.5 text-sm font-medium text-white"
+                  className="inline-flex rounded-lg border border-border/70 bg-foreground/[0.05] px-4 py-2.5 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-foreground/[0.09]"
                 >
                   Vamos conversar
                 </Link>

@@ -31,7 +31,7 @@ export function Contact() {
 
               <a
                 href={primaryContact.href}
-                className="w-fit text-muted transition-colors duration-200 hover:text-accent-blue"
+                className="w-fit text-muted transition-colors duration-200 hover:text-accent"
               >
                 {primaryContact.display || primaryContact.label}
               </a>

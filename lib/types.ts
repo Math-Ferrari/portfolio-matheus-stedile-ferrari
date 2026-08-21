@@ -112,7 +112,7 @@ export type Project = {
   role: string;
   /** Chamada principal, usada no card e no topo do case. */
   tagline: string;
-  /** Trecho da chamada destacado em azul. Precisa aparecer dentro de `tagline`. */
+  /** Trecho da chamada destacado em verde. Precisa aparecer dentro de `tagline`. */
   taglineHighlight?: string;
   /** Resumo de uma ou duas frases. */
   summary: string;

@@ -56,7 +56,7 @@ function BlockBody({ block, screenshotTone }: { block: CaseBlock; screenshotTone
         <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {block.groups.map((group) => (
             <div key={group.label}>
-              <p className="border-t-2 border-accent-blue pt-3 text-caption font-medium uppercase tracking-[0.16em] text-accent-blue">
+              <p className="border-t-2 border-accent pt-3 text-caption font-medium uppercase tracking-[0.16em] text-accent">
                 {group.label}
               </p>
               <ul className="mt-3 flex flex-col gap-2">
@@ -79,7 +79,7 @@ function BlockBody({ block, screenshotTone }: { block: CaseBlock; screenshotTone
               key={column.label}
               className={
                 index === 1
-                  ? "rounded-md border border-border border-l-2 border-l-accent-blue bg-surface p-6"
+                  ? "rounded-md border border-border border-l-2 border-l-accent bg-surface p-6"
                   : "rounded-md border border-border bg-surface-secondary p-6"
               }
             >
@@ -112,7 +112,7 @@ function BlockBody({ block, screenshotTone }: { block: CaseBlock; screenshotTone
               key={group.label}
               className="grid gap-2 border-b border-border py-4 sm:grid-cols-[9rem_1fr] sm:gap-8"
             >
-              <dt className="text-caption font-medium uppercase tracking-[0.16em] text-accent-blue">
+              <dt className="text-caption font-medium uppercase tracking-[0.16em] text-accent">
                 {group.label}
               </dt>
               <dd className="flex flex-wrap gap-x-6 gap-y-2 text-foreground">

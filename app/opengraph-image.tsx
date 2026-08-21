@@ -20,14 +20,14 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#0b1a33",
-          color: "#e8edf6",
+          backgroundColor: "#11100e",
+          color: "#f3f1eb",
           padding: "72px 80px",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div style={{ width: 6, height: 34, backgroundColor: "#5b8cff" }} />
-          <div style={{ fontSize: 26, letterSpacing: 3, color: "#9daec9" }}>{site.name}</div>
+          <div style={{ width: 6, height: 34, backgroundColor: "#78ad8a" }} />
+          <div style={{ fontSize: 26, letterSpacing: 3, color: "#a09e9b" }}>{site.name}</div>
         </div>
 
         <div
@@ -41,7 +41,7 @@ export default function OpengraphImage() {
           }}
         >
           <span>{before}</span>
-          {match ? <span style={{ color: "#5b8cff" }}>{match}</span> : null}
+          {match ? <span style={{ color: "#78ad8a" }}>{match}</span> : null}
           <span>{after}</span>
         </div>
 
@@ -50,8 +50,8 @@ export default function OpengraphImage() {
             display: "flex",
             gap: 40,
             fontSize: 22,
-            color: "#9daec9",
-            borderTop: "1px solid #1e3357",
+            color: "#a09e9b",
+            borderTop: "1px solid #262523",
             paddingTop: 28,
           }}
         >

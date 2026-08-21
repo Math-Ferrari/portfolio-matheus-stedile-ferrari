@@ -4,51 +4,53 @@ import FloatingLines from "@/components/hero/floating-lines";
 import { useTheme } from "@/components/theme/theme-provider";
 
 /**
- * Ordem importa: um "wave" com 1 linha sempre amostra o stop de índice 0 (ver
- * `getLineColor` no shader — para 1 linha, `t = 0` sempre). Com vermelho no
- * meio, um wave de 1 linha nunca o alcança (fica preso ao azul claro), e um
- * wave de 2 linhas soa {0, ~1} = azul claro + quase-azul, pulando o vermelho
- * quase inteiramente (a interpolação só toca o vermelho numa fração
- * infinitesimal, por causa do clamp em 0.9999 do próprio shader). Isso é o
- * que mantém o "bottom" (a fita principal) livre de vermelho por completo.
+ * Profundidade em vez de matiz: os três stops são o MESMO verde
+ * (~155° em OKLCH — musgo/floresta), variando só claridade/saturação —
+ * sálvia luminosa → verde médio vivo → verde profundo mineral. Como não há
+ * mais uma segunda família de cor no gradiente (era azul + vermelho antes),
+ * a antiga regra de "nenhum wave pode interpolar entre dois stops de matizes
+ * diferentes" deixou de ser necessária: misturar dois verdes entre si nunca
+ * produz uma cor fora da família (não existe o equivalente do rosa que saía
+ * de azul+vermelho se somando). `lineCount`/`lineDistance`/posição de cada
+ * wave abaixo continuam as mesmas de antes — só a cor mudou.
  */
-const DARK_GRADIENT = ["#00aaff", "#ff0000", "#0061ff"];
+const DARK_GRADIENT = ["#8fd89e", "#10ae65", "#006738"];
 /**
  * Cores puras e saturadas — não as mesmas (mais fundas) de `--accent-*` no
  * light mode em `globals.css`. Aquelas foram calibradas para texto/botões
  * sobre off-white (precisam de contraste de LEITURA); estas são para o
  * NÚCLEO do glow, que já teve seu próprio problema de saturação resolvido
- * via `uColorBoost` (ver floating-lines.tsx) — cores desbotadas aqui
- * combinadas com o boost ainda saturariam pouco. Igual ao escuro, a ordem é
- * [azul claro, vermelho, azul] (ver comentário grande abaixo).
+ * via `uColorBoost` (ver floating-lines.tsx) — verdes desbotados aqui
+ * combinados com o boost ainda saturariam pouco. Mesmo matiz do escuro
+ * acima, com claridade recalibrada para não lavar sobre o fundo off-white.
  */
-const LIGHT_GRADIENT = ["#20b8ff", "#f22d3d", "#1261ff"];
+const LIGHT_GRADIENT = ["#82c38f", "#249057", "#00532d"];
 
 /** Mesmos hex de `--background` em `app/globals.css`, para o shader compor
     exatamente o fundo do tema onde não há linha (ver `uBaseColor`). */
-const DARK_BASE = "#050505";
-const LIGHT_BASE = "#f6f2ea";
+const DARK_BASE = "#11100e";
+const LIGHT_BASE = "#f2efe8";
 
 /**
  * Só o tema claro precisa: sobre `--background` quase preto, misturar pouco
  * com a base já lê como "cor escurecida", nunca lava o matiz — sobre
- * off-white o mesmo mix baixo lê como pastel (um vermelho pouco saturado
- * sobre branco É rosa, por definição). O boost aproxima mais do traço de
- * glowMask = 1 (cor cheia) sem estourar além dela — ver `uColorBoost`.
- * Calibrado para o núcleo virar cor sólida e só a borda/halo continuar
- * suave, não para "gritar": revisite visualmente se ainda ler apagado.
+ * off-white o mesmo mix baixo lê como pastel (um verde pouco saturado sobre
+ * branco lava para um verde-acinzentado sem vida). O boost aproxima mais do
+ * traço de glowMask = 1 (cor cheia) sem estourar além dela — ver
+ * `uColorBoost`. Calibrado para o núcleo virar cor sólida e só a borda/halo
+ * continuar suave, não para "gritar": revisite visualmente se ainda ler
+ * apagado.
  */
-const LIGHT_COLOR_BOOST = 2.4;
+const LIGHT_COLOR_BOOST = 1.6;
 
 /**
- * Extra só do `top` (o único wave com vermelho, peso 0.1 — ver `uTopBoost`
- * no shader). Sem isto o vermelho nunca sai do pastel mesmo com
- * `LIGHT_COLOR_BOOST`: a 2.4x seu pico mal passa de 20% de saturação, e
- * vermelho pouco saturado sobre off-white é rosa por definição, não uma
- * questão de qual hex usar. Multiplica-se a `LIGHT_COLOR_BOOST` (total
- * ~2.4 × 3 = 7.2 só no `top`), não o substitui.
+ * Extra só do `top` (o wave mais fraco, peso 0.1 — ver `uTopBoost` no
+ * shader). Sem isto ele nunca sai do pastel mesmo com `LIGHT_COLOR_BOOST`: a
+ * 2.4x seu pico mal passa de 20% de saturação sobre um fundo tão claro.
+ * Multiplica-se a `LIGHT_COLOR_BOOST` (total ~2.4 × 3 = 7.2 só no `top`), não
+ * o substitui.
  */
-const LIGHT_TOP_BOOST = 3;
+const LIGHT_TOP_BOOST = 1.8;
 
 /**
  * A composição (posição/rotação das três famílias de linhas, contagem,
@@ -58,35 +60,69 @@ const LIGHT_TOP_BOOST = 3;
  * fora — essas alternativas ou lavam a cor das linhas (escuro→claro sobre um
  * fundo já claro) ou escurecem a tela inteira de forma uniforme; compor
  * dentro do shader evita as duas coisas.
- *
- * Rosa/magenta é o que sai de azul e vermelho se somando no mesmo pixel — é
- * física de luz aditiva (R+B, sem G), não um bug de cor isolado, e acontece
- * de dois jeitos aqui: (1) interpolação dentro do gradiente de UM wave, e
- * (2) o brilho de duas linhas de cores diferentes se tocando ao se cruzarem.
- * As duas coisas são atacadas separadamente:
- *
- * (1) `getLineColor` interpola linearmente entre stops consecutivos; para um
- * wave com N linhas, `t = índice/(N-1)`, então só N ∈ {1, 2, 3} garante que
- * todo `t` caia exatamente EM CIMA de um stop, nunca entre dois — é por isso
- * que nenhum wave aqui passa de 3 linhas.
- *
- * (2) Com vermelho isolado no `top` (o wave mais apagado, 10% do brilho) e o
- * `bottom` (a fita principal, mais visível) restrito a azul claro + azul via
- * a ordem do gradiente acima, as duas famílias de cor só coexistem dentro do
- * MESMO wave em `top` — nunca entre `top` e `bottom`, que ocupam regiões
- * diferentes da capa. `lineDistance` alto em cada wave afasta as linhas de
- * um mesmo wave entre si, reduzindo a chance de seus brilhos se tocarem.
  */
-export function ThemedFloatingLines() {
+type ThemedFloatingLinesProps = {
+  /**
+   * Repassado direto ao `progress` de `FloatingLines` — ver o comentário
+   * daquele prop. `ThemedFloatingLines` não sabe (nem precisa saber) que
+   * existe uma transição de scroll; só encaminha o ref. Ausente = 0 sempre,
+   * comportamento idêntico ao atual.
+   */
+  progressRef?: React.RefObject<number>;
+  /** Repassado direto ao `linesFade` de `FloatingLines` — ver o comentário
+      daquele prop. Ausente = 1 sempre (sem fade), idêntico ao atual. */
+  linesFadeRef?: React.RefObject<number>;
+  /** Repassado direto ao `linesExit` de `FloatingLines`. Ausente = 0 sempre
+      (sem espalhamento lateral), idêntico ao atual. */
+  linesExitRef?: React.RefObject<number>;
+  /** Repassado direto ao `baseColorMorph` de `FloatingLines` — o quanto
+      migrar de `baseColor` (a própria hero) para a superfície da PRÓXIMA
+      seção (ver `nextSurface` abaixo). Ausente = shader nunca recalcula
+      `uBaseColor` por frame, idêntico ao atual. */
+  baseColorMorphRef?: React.RefObject<number>;
+};
+
+export function ThemedFloatingLines({
+  progressRef,
+  linesFadeRef,
+  linesExitRef,
+  baseColorMorphRef,
+}: ThemedFloatingLinesProps = {}) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+
+  /* Alvo do morph de `uBaseColor` — a mesma superfície (`--tone-graphite`)
+     que `Profile` (a seção seguinte) usa como `bg-tone-graphite`, lida ao
+     vivo do token do tema (não um hex duplicado aqui): a hero só precisa
+     terminar com a MESMA cor que o CSS já vai desenhar em seguida, então
+     "hardcoded" aqui seria exatamente o tipo de duplicação que quebra na
+     primeira vez que alguém recalibrar os tokens em `globals.css`. Lido
+     direto no corpo do render (mesmo espírito de `getSnapshot` em
+     `theme-provider.tsx`) — não em efeito/estado: já é reativo a `theme`
+     porque este componente inteiro re-renderiza quando o contexto muda, e
+     `getComputedStyle` é síncrono, então não há um frame "atrasado" com o
+     valor antigo. No servidor (`document` inexistente) cai no fallback —
+     a própria `baseColor` do tema, sem diferença, sem morph visível até o
+     cliente montar. */
+  const nextSurface =
+    typeof document !== "undefined"
+      ? getComputedStyle(document.documentElement).getPropertyValue("--tone-graphite").trim() ||
+        (isDark ? DARK_BASE : LIGHT_BASE)
+      : isDark
+        ? DARK_BASE
+        : LIGHT_BASE;
 
   return (
     <FloatingLines
       linesGradient={isDark ? DARK_GRADIENT : LIGHT_GRADIENT}
       baseColor={isDark ? DARK_BASE : LIGHT_BASE}
+      baseColorTo={nextSurface}
       colorBoost={isDark ? 1 : LIGHT_COLOR_BOOST}
       topBoost={isDark ? 1 : LIGHT_TOP_BOOST}
+      progress={progressRef}
+      linesFade={linesFadeRef}
+      linesExit={linesExitRef}
+      baseColorMorph={baseColorMorphRef}
       mixBlendMode="normal"
       enabledWaves={["top", "middle", "bottom"]}
       lineCount={[3, 1, 2]}

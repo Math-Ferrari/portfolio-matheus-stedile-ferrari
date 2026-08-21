@@ -594,56 +594,70 @@ export function getNextProject(slug: string): Project {
  * case completo (mesmo raciocínio de `heroProjects`): um texto próprio para
  * "bater o olho", com `slug` ligando ao projeto real em `projects`. As
  * palavras-chave vêm de funcionalidades já documentadas no case de cada
- * projeto — nenhuma nova aqui.
+ * projeto — nenhuma nova aqui. `cta` é o texto do link do card (varia por
+ * natureza do projeto: "Explorar" para os dois cases, "Visitar" para o site
+ * institucional, que é navegável de verdade).
  *
- * A ORDEM deste array é a hierarquia visual da seção, do maior peso para o
- * menor: PlatoTruck (largura inteira) → PlatoTruck.com (7/12) →
- * tudoPrabarco (5/12). `span` é o que o componente lê para montar o grid.
+ * A ORDEM deste array é a ordem de leitura da seção: PlatoTruck (projeto
+ * principal) → PlatoTruck.com → tudoPrabarco. Os três cards têm o MESMO
+ * tamanho base (grid de 3 colunas iguais, ver `selected-projects.tsx`); o
+ * destaque do principal vem de tratamento visual (contraste de borda/fundo,
+ * rótulo "Case principal"), não de um card maior — por isso não existe um
+ * campo `span` aqui.
  */
 export const selectedProjects = [
   {
     slug: "sistema-platotruck",
     category: "Sistema interno",
-    span: "full",
-    description: "Sistema interno multiempresa para centralizar operações, estoque e controle de acesso.",
-    keywords: ["Multiempresa", "Permissões", "Segurança", "Estoque", "Inventário", "Scanner"],
+    description:
+      "Sistema interno multiempresa para centralizar estoque, usuários, permissões e processos operacionais.",
+    keywords: ["Multiempresa", "Estoque", "Segurança", "Dashboards"],
+    cta: "Explorar case",
   },
   {
     slug: "platotruck-site",
     category: "Site institucional",
-    span: "wide",
     description: "Site institucional desenvolvido para apresentar a empresa, seus produtos e sua atuação.",
-    keywords: ["Web", "Responsivo", "Produtos", "Institucional"],
+    keywords: ["Next.js", "Responsivo", "Produtos"],
+    cta: "Visitar projeto",
   },
   {
     slug: "tudoprabarco",
-    category: "Plataforma / Marketplace",
-    span: "narrow",
-    description: "Marketplace digital para o setor náutico.",
-    keywords: ["Full Stack", "Marketplace", "Busca", "Avaliações", "Chat"],
+    category: "Marketplace",
+    description: "Marketplace náutico conectando proprietários, empresas e prestadores de serviços.",
+    keywords: ["Full Stack", "Marketplace", "Busca", "Avaliações"],
+    cta: "Explorar projeto",
   },
 ] as const;
 
 /**
- * Aprofundamento do case principal, depois de "Projetos selecionados" — essa
- * seção NÃO reapresenta o projeto (nome, funcionalidades, preview e CTA já
- * apareceram no card). Ela muda de função: conta como o sistema foi pensado,
- * problema → decisão → solução, até a engenharia por trás da interface.
+ * NÃO RENDERIZADO. Era o aprofundamento do case principal na home, logo
+ * depois de "Projetos selecionados" — removido de lá porque duplicava o que
+ * a própria página `/projetos/sistema-platotruck` já faz, com mais
+ * profundidade (ver `projects[0].case.blocks` e o comentário em
+ * `app/page.tsx`). O componente que consumia isto,
+ * `components/sections/platotruck-case.tsx`, foi apagado (confirmado sem
+ * outro importador antes de apagar).
  *
- * Tudo abaixo é uma curadoria/paráfrase do case completo em
- * `projects[0].case.blocks` (contexto, problema, antes-e-depois, solução,
+ * Mantido aqui só como MATÉRIA-PRIMA para expandir o case de verdade mais
+ * tarde — a maior parte do texto abaixo já é paráfrase do que já existe em
+ * `case.blocks` (contexto, problema, antes-e-depois, solução,
  * funcionalidades, multiempresa, estoque, scanner, usuarios-e-permissoes,
- * seguranca) — nenhum fato novo, só reorganizado para a leitura da home.
- * `engenharia.points` evita a palavra "auditoria" de propósito: o bloco
- * `seguranca` do case é explícito que uma auditoria técnica verificada ainda
- * não existe; o que está confirmado é o histórico de movimentações, citado
- * como tal.
+ * seguranca), então não adiciona fato novo. As duas partes que NÃO têm
+ * equivalente ainda em `case.blocks` e valem a pena migrar quando o case for
+ * trabalhado:
  *
- * As screenshots reais (`public/2.png`, `public/3.png`) entram só nas duas
- * decisões a que pertencem (usuários/permissões e estoque/inventário) — de
- * propósito, não logo no início do bloco: `public/1.png` já é a capa do
- * projeto no card de "Projetos selecionados" um pouco acima, então repeti-la
- * aqui seria a mesma imagem duas vezes na mesma tela.
+ *   - `porque` ("Por que um sistema interno") — o raciocínio de por que um
+ *     software genérico não bastava; hoje só implícito no bloco `solucao`.
+ *   - `engenharia.points` — a lista curta de controles (regras no servidor,
+ *     autorização por nível + empresa, validação antes de persistir,
+ *     controles no banco, histórico) é mais específica que o texto livre do
+ *     bloco `seguranca` e serviria de base para o bloco `decisoes-tecnicas`
+ *     (hoje `pending`).
+ *
+ * Se este objeto ficar obsoleto por completo (ex.: o case for reescrito do
+ * zero), pode ser apagado — não precisa sobreviver indefinidamente só por
+ * este comentário.
  */
 export const platotruckCase = {
   eyebrow: "Case em destaque",

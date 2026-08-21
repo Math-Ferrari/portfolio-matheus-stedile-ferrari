@@ -29,7 +29,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggleTheme}
       aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
       className={cn(
-        "rounded-sm p-0.5 text-foreground/70 transition-colors duration-200 hover:text-foreground",
+        "inline-flex size-11 items-center justify-center text-foreground/70 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
         className,
       )}
     >

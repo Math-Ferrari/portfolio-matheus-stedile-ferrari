@@ -8,8 +8,8 @@ import { engineering, techGroups } from "@/data/site";
  * segurança. Na home o objetivo é sinalizar que o assunto é tratado; o
  * "como foi implementado" pertence aos cases.
  *
- * O ponto vermelho antes do último princípio é o detalhe cromático raro da
- * seção — um só, no fecho da lista.
+ * O ponto no verde mais profundo antes do último princípio é o detalhe
+ * cromático raro da seção — um só, no fecho da lista.
  */
 export function StackEngineering() {
   const lastIndex = engineering.principles.length - 1;
@@ -28,7 +28,7 @@ export function StackEngineering() {
                   key={group.label}
                   className="grid gap-2 border-b border-border py-5 sm:grid-cols-[9rem_1fr] sm:gap-8"
                 >
-                  <dt className="text-caption font-medium uppercase tracking-[0.16em] text-accent-blue">
+                  <dt className="text-caption font-medium uppercase tracking-[0.16em] text-accent">
                     {group.label}
                   </dt>
                   <dd className="text-foreground">{group.items.join(" · ")}</dd>
@@ -51,8 +51,8 @@ export function StackEngineering() {
                     aria-hidden
                     className={
                       index === lastIndex
-                        ? "size-1.5 shrink-0 bg-accent-red"
-                        : "size-1.5 shrink-0 bg-accent-blue"
+                        ? "size-1.5 shrink-0 bg-accent-strong"
+                        : "size-1.5 shrink-0 bg-accent"
                     }
                   />
                   {principle}

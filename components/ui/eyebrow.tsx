@@ -9,7 +9,7 @@ type EyebrowProps = {
   className?: string;
 };
 
-/** Rótulo pequeno em caixa alta, com um traço azul, no topo de cada seção. */
+/** Rótulo pequeno em caixa alta, com um traço verde, no topo de cada seção. */
 export function Eyebrow({ children, index, tone = "base", className }: EyebrowProps) {
   const style = tones[tone];
 
@@ -26,7 +26,7 @@ export function Eyebrow({ children, index, tone = "base", className }: EyebrowPr
           {index}
         </span>
       ) : (
-        <span aria-hidden className="h-px w-6 bg-accent-blue" />
+        <span aria-hidden className="h-px w-6 bg-accent" />
       )}
       <span>{children}</span>
     </p>

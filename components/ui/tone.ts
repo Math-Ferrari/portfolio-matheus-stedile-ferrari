@@ -29,7 +29,7 @@ const shared = {
   title: "text-foreground",
   lead: "text-muted",
   label: "text-muted",
-  index: "text-accent-blue",
+  index: "text-accent",
   line: "border-border",
   body: "text-muted",
 } as const;

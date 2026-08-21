@@ -25,7 +25,7 @@ export function SiteFooter() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-foreground transition-colors duration-200 hover:text-accent-blue-light"
+                    className="text-sm text-foreground transition-colors duration-200 hover:text-accent"
                   >
                     {item.label}
                   </Link>
@@ -44,7 +44,7 @@ export function SiteFooter() {
                   <li key={contact.label}>
                     <a
                       href={contact.href}
-                      className="text-sm text-foreground transition-colors duration-200 hover:text-accent-blue-light"
+                      className="text-sm text-foreground transition-colors duration-200 hover:text-accent"
                       {...(contact.href.startsWith("http")
                         ? { target: "_blank", rel: "noreferrer noopener" }
                         : {})}

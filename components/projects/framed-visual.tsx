@@ -31,7 +31,7 @@ export function FramedVisual({
 }: FramedVisualProps) {
   return (
     <div className={cn("group relative", className)}>
-      <div aria-hidden className="absolute left-0 top-0 size-20 bg-accent-blue md:size-28" />
+      <div aria-hidden className="absolute left-0 top-0 size-20 bg-accent md:size-28" />
       <div
         aria-hidden
         className="absolute bottom-0 right-0 h-2/3 w-2/3 rounded-sm bg-surface-elevated"

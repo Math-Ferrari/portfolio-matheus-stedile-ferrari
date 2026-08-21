@@ -7,7 +7,7 @@ type BrandSignatureProps = {
 };
 
 /**
- * Assinatura tipográfica: iniciais em serifa azul, filete e nome completo.
+ * Assinatura tipográfica: iniciais em serifa verde, filete e nome completo.
  *
  * As iniciais são decorativas (`aria-hidden`) — leitores de tela leem só o nome
  * completo, sem repetir "MSF Matheus Stedile Ferrari". Header e rodapé usam
@@ -23,7 +23,7 @@ export function BrandSignature({ className }: BrandSignatureProps) {
     >
       <span
         aria-hidden
-        className="font-serif text-[1.15em] font-semibold tracking-[0.04em] text-accent-blue transition-colors duration-200 group-hover:text-accent-blue-light"
+        className="font-serif text-[1.15em] font-semibold tracking-[0.04em] text-accent transition-colors duration-200 group-hover:text-accent-soft"
       >
         {site.initials}
       </span>

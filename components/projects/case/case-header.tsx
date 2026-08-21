@@ -23,7 +23,7 @@ export function CaseHeader({ project }: CaseHeaderProps) {
       <Container className="pb-14 pt-8 md:pt-12">
         <Link
           href="/projetos"
-          className="group inline-flex items-center gap-2 text-sm text-muted transition-colors duration-200 hover:text-accent-blue"
+          className="group inline-flex items-center gap-2 text-sm text-muted transition-colors duration-200 hover:text-accent"
         >
           <ArrowLeft
             aria-hidden
@@ -36,7 +36,7 @@ export function CaseHeader({ project }: CaseHeaderProps) {
         <div className="mt-10 grid items-center gap-x-12 gap-y-12 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <p className="rise rise-1 flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
-              <span aria-hidden className="h-px w-6 bg-accent-blue" />
+              <span aria-hidden className="h-px w-6 bg-accent" />
               {project.kind} — {project.role}
             </p>
 
@@ -46,7 +46,7 @@ export function CaseHeader({ project }: CaseHeaderProps) {
 
             <p className="rise rise-3 mt-6 max-w-[44ch] text-body-lg text-foreground">
               {before}
-              {match ? <span className="text-accent-blue">{match}</span> : null}
+              {match ? <span className="text-accent">{match}</span> : null}
               {after}
             </p>
 

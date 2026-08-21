@@ -7,88 +7,98 @@
    Os valores reais vivem aqui, fora do `@theme`, porque precisam variar por
    tema — `@theme` gera utilities uma vez, no build; quem muda em runtime é a
    cascata normal do CSS. `:root` é o padrão (escuro: é o que a página deve
-   mostrar sem JavaScript, e é a identidade que a hero já usava antes de
-   existir tema claro). `[data-theme="light"]` sobrescreve quando o usuário
-   está no claro. O `@theme` logo abaixo só faz a ponte via `var()` para o
-   Tailwind gerar `bg-background`, `text-foreground` etc.
+   mostrar sem JavaScript). `[data-theme="light"]` sobrescreve quando o
+   usuário está no claro. O `@theme` logo abaixo só faz a ponte via `var()`
+   para o Tailwind gerar `bg-background`, `text-foreground` etc.
 
-   Os dois temas não são um invertido do outro: o escuro é preto/cinza-frio
-   com acentos vivos (azul claro → azul → vermelho); o claro é bege/off-white
-   quente com os MESMOS três acentos, porém mais fundos — saturados demais
-   sobre bege leriam como neon, não como a mesma identidade "premium".
+   Hierarquia de cor, do que domina para o que pontua:
+
+     1. Base — neutra (preto suave/carvão/grafite no escuro, off-white/bege
+        muito leve no claro). `--background`/`--surface-*`/`--tone-*` vivem
+        aqui: quase acromáticos (chroma baixíssimo, ~0.003–0.010 em OKLCH),
+        nunca lendo como "verde-acinzentado" — só uma variação de luminância
+        e de um leve calor, não de matiz perceptível. É o que domina a
+        composição inteira.
+     2. Contraste — `--foreground` (quase branco no escuro, quase preto no
+        claro) e `--muted` (a mesma família, um degrau mais discreto).
+     3. Destaque — `--accent-soft`/`--accent`/`--accent-strong`, a ÚNICA
+        família de accent de marca (verde musgo/floresta, ~155° em OKLCH).
+        Reservado a acentos pontuais: labels, links, bordas finas, hover,
+        CTA, a hero (`FloatingLines`) e microdetalhes do rodapé — nunca
+        fundo de seção ou de card inteiro.
+
+   Não azul, não vermelho: vermelho não é usado em lugar nenhum (nem como
+   branding, nem como semântico — o site não tem estados de erro hoje; se
+   precisar, introduza um token `--destructive` separado, não reaproveite
+   `--accent-*`). Os dois temas não são um invertido do outro: o escuro é
+   grafite quase preto, o claro é off-white/bege quente — os acentos verdes
+   usam o MESMO matiz nos dois, recalibrados de luminância (o verde saturado
+   do escuro leria pastel sobre um fundo tão claro).
    ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --background: #050505;
-  --foreground: #f5f5f7;
-  --surface: #0a0a0c;
-  --surface-secondary: #0e1013;
-  --surface-elevated: #171a20;
-  --muted: #a1a1a6;
+  --background: #11100e;
+  --foreground: #f3f1eb;
+  --surface: #1d1c1a;
+  --surface-secondary: #262523;
+  --surface-elevated: #33312f;
+  --muted: #a09e9b;
   --border: rgb(255 255 255 / 10%);
 
-  --accent-blue-light: #00aaff;
-  --accent-blue: #0061ff;
-  --accent-red: #ff0000;
-
-  /* Só a linha de cargo da hero (`InteractiveHero`) usa estas — mesmos tons
-     do dark de `--accent-*` acima, para não mudar nada aqui. Existem à parte
-     porque o par light abaixo precisa ficar mais vivo que `--accent-*`
-     (calibrado para leitura em botões/links no site inteiro), acompanhando o
-     FloatingLines sem alterar CTA, sublinhado de nav ou rodapé. */
-  --hero-tagline-blue-light: #00aaff;
-  --hero-tagline-blue: #0061ff;
-  --hero-tagline-red: #ff0000;
+  /* Três papéis, um matiz só (~155°, verde musgo/floresta): `soft` é
+     decorativo (divisores, glows, ícones) — não tem contraste suficiente
+     para carregar texto de leitura; `accent` é o principal (links, labels,
+     estados ativos, texto); `strong` é o mais profundo, usado com
+     parcimônia (destaque de headline, botão sólido com texto branco/claro
+     em cima, hover raro de ícone) — ver auditoria de contraste no relatório
+     de implementação. Nomes semânticos de propósito, não `green-1/2/3`.
+     São os ÚNICOS tokens de cor do sistema com chroma alto de propósito —
+     todo o resto (acima e abaixo) é neutro. */
+  --accent-soft: #a1caac;
+  --accent: #78ad8a;
+  --accent-strong: #2a7449;
 
   /*
-   * Cenas — a mesma identidade da hero em variações sutis de tom, para as
-   * seções abaixo dela nunca empilharem o mesmo preto repetido. Cada seção
-   * escolhe uma via `tone` (ver `components/ui/tone.ts`); nenhuma é usada
-   * duas vezes seguidas na ordem real da página. Diferenças propositalmente
-   * pequenas — variam matiz mais que luminosidade, para continuar lendo como
-   * "a mesma superfície quase preta", não uma paleta nova.
+   * Cenas — variações MUITO sutis de fundo, só para as seções abaixo da hero
+   * nunca empilharem o mesmo preto repetido duas vezes seguidas. Cada seção
+   * escolhe uma via `tone` (ver `components/ui/tone.ts`). Chroma quase zero
+   * de propósito — a diferença entre elas é praticamente só luminância (e um
+   * calor/frescor imperceptível), NUNCA um matiz reconhecível: não são "um
+   * verde", "um azul" ou "um bege" — são graus de carvão/grafite. Os nomes
+   * (graphite/navy/slate/petrol) são só identificadores de cena herdados do
+   * desenho anterior; não descrevem mais a cor em si.
    */
-  --tone-graphite: #0d0e11;
-  --tone-navy: #0a0f1c;
-  --tone-slate: #10131a;
-  --tone-petrol: #0a1614;
+  --tone-graphite: #131211;
+  --tone-navy: #121415;
+  --tone-slate: #161514;
+  --tone-petrol: #101210;
 }
 
 [data-theme="light"] {
-  --background: #f6f2ea;
-  --foreground: #111111;
-  --surface: #efeae0;
-  --surface-secondary: #ece6d9;
-  --surface-elevated: #e4ddd0;
-  --muted: #66635e;
+  --background: #f2efe8;
+  --foreground: #111315;
+  --surface: #ebe9e5;
+  --surface-secondary: #e6e2dd;
+  --surface-elevated: #dad8d2;
+  --muted: #595854;
   --border: rgb(0 0 0 / 10%);
 
-  /* Mesma família de matiz do escuro, um passo mais fundos — a "versão sob
-     luz de dia" dos mesmos três acentos, não uma paleta nova. */
-  --accent-blue-light: #0a84c4;
-  --accent-blue: #0047c2;
-  --accent-red: #c4281e;
+  /* Mesmo matiz do escuro (~155°), recalibrado mais escuro: sobre um fundo
+     tão claro (`--background` acima), o verde saturado do escuro cairia
+     abaixo de AA e leria pastel — luminância abaixa, saturação se mantém.
+     Contraste verificado contra `--background`, `--surface-elevated` e
+     `--tone-*` (ver relatório): as três variantes seguram >=4.5:1 como
+     texto; `strong` também segura texto branco em cima como botão sólido. */
+  --accent-soft: #559770;
+  --accent: #1b683e;
+  --accent-strong: #085630;
 
-  /* Mais saturadas que `--accent-*` acima, mas SEM copiar o hex cheio do
-     núcleo do FloatingLines (`LIGHT_GRADIENT` em `themed-floating-lines.tsx`)
-     — aquele é calibrado para o centro de um glow sobre o próprio
-     `--background`, não para texto: testado contra WCAG (fundo #f6f2ea),
-     `#20b8ff`/`#f22d3d` cru caem para ~3:1, abaixo de AA. Cada stop aqui
-     segura o mesmo matiz do núcleo, saturação alta, mas luminância só o
-     quanto o contraste permite — blue-light já nasce perto do teto (mesma
-     lightness do `--accent-blue-light` atual, só mais saturado: contraste
-     não piora); blue/red tinham folga e foram escurecidos até ~4.4–4.5:1. */
-  --hero-tagline-blue-light: #0286cc;
-  --hero-tagline-blue: #1261ff;
-  --hero-tagline-red: #d61f2c;
-
-  /* Mesmos seis papéis do escuro, cada um com seu par claro: off-white,
-     off-white ainda mais suave, azul-acinzentado muito pálido, bege-cinza
-     morno, verde-acinzentado pálido. Nunca branco puro. */
-  --tone-graphite: #f9f7f2;
-  --tone-navy: #edf1f5;
-  --tone-slate: #efece4;
-  --tone-petrol: #eef2ee;
+  /* Mesmos quatro papéis do escuro — variações quase imperceptíveis de
+     off-white/bege, nunca um matiz reconhecível. Nunca branco puro. */
+  --tone-graphite: #f0efec;
+  --tone-navy: #e8ecee;
+  --tone-slate: #eae9e6;
+  --tone-petrol: #e6ebe8;
 }
 
 @theme {
@@ -100,9 +110,9 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
 
-  --color-accent-blue-light: var(--accent-blue-light);
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-red: var(--accent-red);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
 
   --color-tone-graphite: var(--tone-graphite);
   --color-tone-navy: var(--tone-navy);
@@ -203,13 +213,13 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent-blue);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 2px;
   }
 
   ::selection {
-    background-color: var(--accent-blue);
+    background-color: var(--accent-strong);
     color: #ffffff;
   }
 
@@ -425,51 +435,141 @@
   }
 }
 
-/* ── Nome e cargo ──────────────────────────────────────────────────────────
-   Entrada única, sutil: opacity + blur + um leve translateY — não mais o
-   wipe de clip-path do hero editorial. "Blur" é um recurso deliberado aqui
-   (não um efeito de carregamento), pedido junto com opacity/transform. */
-
-@keyframes hero-fade-blur {
+/* Entrada da capa: somente transform + opacity. Nenhum filtro é aplicado a
+   texto; assim o navegador não cria texturas retangulares intermediárias
+   sobre o canvas WebGL. */
+@keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translateY(1.1rem);
-    filter: blur(14px);
+    transform: translate3d(0, 0.85rem, 0) scale(0.985);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: blur(0);
   }
 }
 
-.hero-fade-blur {
-  animation: hero-fade-blur var(--duration-slow) var(--ease-premium) both;
+.hero-rise {
+  animation: hero-rise var(--duration-slow) var(--ease-premium) both;
 }
 
-/* Ao rolar, o quadro se desfaz em vez de simplesmente sair da tela —
-   opacity/scale/blur amarrados à posição de scroll via `animation-timeline`.
-   `@supports` porque a feature ainda não é universal: sem suporte, o texto
-   simplesmente continua visível até sair da viewport pelo scroll normal,
-   nunca quebra. */
-@supports (animation-timeline: scroll()) {
-  .hero-scroll-fade {
-    animation: hero-scroll-fade-out linear both;
-    animation-timeline: scroll(root block);
-    animation-range: 0 55vh;
+/* ── Hero → perfil: uma coreografia, um relógio ──────────────────────────
+   Hero e perfil compartilham a cena, mas não são mais dois layouts em
+   crossfade. O Lenis escreve fases semânticas no wrapper; nome, headline,
+   retrato, detalhes e shader leem o mesmo frame. Todos os estados iniciais
+   do perfil são zero, especialmente o retrato.
+
+   A altura total (`--hero-transition-height`) é o que dá distância física de
+   scroll ao hold da fase 3 (ver o comentário grande em hero-transition.tsx):
+   com `.hero-transition-sticky` fixo em 100svh, o "percurso" real é
+   altura-do-wrapper menos 100svh, e HOLD_START (0.65) reserva os últimos 35%
+   desse percurso como leitura parada. 220svh dá ~120svh de percurso — um
+   hold de ~42svh, generoso o bastante pra ler headline + parágrafo sem virar
+   uma pausa que pareça travamento. Calibrado em vídeo, não é fórmula fixa. */
+
+.hero-transition-wrapper {
+  position: relative;
+  height: var(--hero-transition-height, 220svh);
+}
+
+/* A célula compartilhada onde nome/tagline/CTA e `AboutIntro` se cruzam —
+   ver o comentário grande em interactive-hero.tsx para o porquê do grid.
+   Sem regras próprias aqui fora do `@media (prefers-reduced-motion)`
+   abaixo: o `grid`/`place-items-center` já vêm como classes Tailwind no
+   próprio elemento. */
+
+.hero-transition-sticky {
+  position: sticky;
+  top: 0;
+  isolation: isolate;
+  display: flex;
+  height: 100svh;
+  flex-direction: column;
+  overflow: hidden;
+  /* `color-mix` interpola, em CSS puro, de `--background` (a própria hero)
+     para `--tone-graphite` (o tom que `Profile`, a seção seguinte, usa como
+     `bg-tone-graphite`) — os DOIS já são tokens de tema, então isto segue
+     claro/escuro automaticamente, sem cor fixa em lugar nenhum. Com
+     `--tp-bg-morph` ausente ou 0, o resultado é 100% `--background`,
+     idêntico ao que a hero sempre teve. O canvas do FloatingLines (opaco,
+     preenche a mesma área) faz o morph equivalente via `uBaseColor` — ver
+     `baseColorTo`/`baseColorMorph` em floating-lines.tsx — os dois têm que
+     migrar juntos ou o retângulo do canvas ficaria destacado do fundo CSS
+     ao redor dele. */
+  background-color: color-mix(
+    in oklch,
+    var(--background),
+    var(--tone-graphite) calc(var(--tp-bg-morph, 0) * 100%)
+  );
+  /* Sem `transition` aqui de propósito: `--tp-bg-morph` já é escrito a cada
+     tick de scroll (ver hero-transition.tsx) — uma transição CSS por cima
+     faria a cor sempre correr atrás da posição real do scroll (perceptível
+     em scroll rápido), quando o pedido é o oposto: toda propriedade visual
+     interpolando 1:1 com o progresso, sem suavização de tempo por cima. */
+}
+
+/* CTA já invisível (opacity ~0, ver style inline em interactive-hero.tsx)
+   não deveria continuar focável/clicável no meio da transição. */
+[data-past-cta="true"] .hero-transition-cta {
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .hero-transition-wrapper {
+    /* Mesmo raciocínio do desktop (ver acima), percurso mais curto no toque
+       — 175svh menos 100svh de sticky = ~75svh de percurso, ~26svh de hold.
+       A ordem visual permanece idêntica, só a distância física muda. */
+    height: var(--hero-transition-height, 175svh);
   }
 }
 
-@keyframes hero-scroll-fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+/* Telas baixas (laptop com barra de endereço/favoritos comendo altura, ou
+   janela não-maximizada) — `#profile-title` some 4 linhas com `7.1vw`
+   (Construo / software para / operações / reais.) que cabem folgado em
+   ~900px de altura, mas encostam no header por volta de ~760px pra baixo.
+   `min(7.1vw, 8svh)` troca a escala por ALTURA só dentro deste breakpoint;
+   acima de 820px de altura este bloco nem existe, então o heading nas telas
+   comuns (a maioria) fica do tamanho original, sem cap nenhum. Calibrado e
+   testado até 664px de altura (ver auditoria da tarefa de recoloração da
+   seção de perfil) — folga de ~10px do header nesse extremo. */
+@media (max-height: 820px) {
+  #profile-title {
+    font-size: clamp(2.1rem, min(7.1vw, 8svh), 6.4rem);
   }
-  to {
-    opacity: 0;
-    transform: translateY(-1.5rem) scale(0.97);
-    filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* `HeroTransition` também não registra o listener do Lenis neste modo —
+     isto é reforço visual/estrutural, não a única linha de defesa. */
+  .hero-transition-wrapper {
+    height: auto;
+  }
+
+  .hero-transition-sticky {
+    position: static;
+    height: auto;
+    min-height: 100svh;
+  }
+
+  /* Sem a transição rodando, a sobreposição vira empilhamento normal — nome
+     e `AboutIntro` cada um no seu lugar, os dois totalmente visíveis. Sem
+     isto, `AboutIntro` ficaria preso em opacity: 0 para sempre (seu repouso
+     "em transição" é invisível; só o scroll o traria a 1) — e como o
+     `opacity`/`transform`/`clip-path` que o controlam vivem em `style` inline
+     no `<h2>`/`<p>` dele (não no filho direto de `.hero-stage`), a regra
+     precisa alcançar TODOS os descendentes, não só os filhos diretos. */
+  .hero-stage {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--spacing-section);
+  }
+
+  .hero-stage * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
   }
 }
 
@@ -502,23 +602,13 @@
   .rise,
   .reveal,
   .reveal-title,
-  .rise-visual {
+  .rise-visual,
+  .hero-rise {
     animation: none;
     opacity: 1;
     clip-path: none;
     transform: none;
     transition: none;
-  }
-
-  /* `.hero-scroll-fade` usa `animation-timeline: scroll()`, que não é
-     baseado em duração — o catch-all de 0.01ms mais abaixo não o desativa,
-     por isso precisa da própria regra aqui. */
-  .hero-fade-blur,
-  .hero-scroll-fade {
-    animation: none;
-    opacity: 1;
-    transform: none;
-    filter: none;
   }
 
   /* Sem isso a regra global de duração 0.01ms deixaria o loop infinito

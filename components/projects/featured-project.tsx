@@ -34,14 +34,14 @@ export function FeaturedProject({ project, as: Heading = "h3" }: FeaturedProject
             <Eyebrow>Case principal</Eyebrow>
 
             <Heading className="text-balance-title mt-7 text-heading-xl font-medium text-foreground">
-              <Link href={href} className="transition-colors duration-200 hover:text-accent-blue-light">
+              <Link href={href} className="transition-colors duration-200 hover:text-accent">
                 {before}
-                {match ? <span className="text-accent-blue-light">{match}</span> : null}
+                {match ? <span className="text-accent">{match}</span> : null}
                 {after}
               </Link>
             </Heading>
 
-            <p className="mt-6 text-caption font-medium uppercase tracking-[0.16em] text-accent-blue-light">
+            <p className="mt-6 text-caption font-medium uppercase tracking-[0.16em] text-accent">
               {project.name} — {project.kind}
             </p>
 

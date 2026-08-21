@@ -108,7 +108,7 @@ export const hero = {
   eyebrow: `${site.name} — ${site.role}`,
   lines: heroLines,
   title: heroLines.join(" "),
-  /** Trecho do título destacado em azul. Precisa aparecer dentro de `title`. */
+  /** Trecho do título destacado em verde. Precisa aparecer dentro de `title`. */
   highlight: "software",
   lead: "Desenvolvo sistemas internos, aplicações web e integrações para organizar operações, reduzir trabalho manual e deixar a informação acessível para quem precisa decidir.",
   primaryCta: { label: "Ver projetos", href: "#projetos" },
@@ -154,18 +154,24 @@ export const heroVisual: Screenshot = {
 
 /**
  * Apresentação — a ÚNICA vez que o posicionamento é declarado no corpo da
- * home. O heading fala do que construo ("Software para operações reais.");
- * o cargo aparece só uma vez abaixo dele, dentro do parágrafo, em prosa
- * pessoal — não repetido como um segundo heading, que é como a hero já o
- * mostra ("Engenheiro de Software · Desenvolvimento Full Stack" na capa). Um
- * parágrafo curto só, de propósito: essa seção precisa ser lida em segundos.
- * A antiga seção "Sobre" (quatro parágrafos, mais abaixo) foi removida por
- * dizer o mesmo com outras palavras — o que ela tinha de próprio (graduação)
- * está em `about`, que continua exportado para uma futura página /sobre.
+ * home (dentro da própria cena da hero, ver `about-intro.tsx`).
+ * `headingLines` e `highlight` preservam as quebras editoriais da headline;
+ * `intro` e `body` formam as duas camadas de texto; `keywords` alimenta
+ * a lista numerada de especialidades.
  */
 export const profile = {
-  heading: "Software para operações reais.",
-  body: "Sou Engenheiro de Software e Desenvolvedor Full Stack. Trabalho do frontend ao backend, criando sistemas internos, aplicações web e integrações a partir de problemas e regras de negócio reais.",
+  eyebrow: "Engenharia aplicada ao cotidiano",
+  headingLines: ["Construo", "software para"],
+  highlight: "operações reais.",
+  intro: "Sou Engenheiro de Software e Desenvolvedor Full Stack. Atuo do frontend ao backend, criando sistemas internos, aplicações web e integrações voltadas a problemas reais de operação.",
+  body: "Transformo regras de negócio, processos e necessidades operacionais em software útil — com atenção à estrutura, usabilidade, consistência e implementação prática.",
+  keywords: [
+    "Sistemas sob medida",
+    "Aplicações web",
+    "Full Stack",
+    "Integrações e automações",
+    "Regras de negócio",
+  ],
 } as const;
 
 /**

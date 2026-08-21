@@ -26,18 +26,18 @@ export function CaseNav({ next }: CaseNavProps) {
         <Reveal className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
-              <span aria-hidden className="h-px w-6 bg-accent-blue" />
+              <span aria-hidden className="h-px w-6 bg-accent" />
               Próximo projeto
             </p>
             <h2 className="mt-5 text-heading-lg font-medium -tracking-[0.03em] text-foreground">
               <Link
                 href={`/projetos/${next.slug}`}
-                className="group inline-flex items-center gap-4 transition-colors duration-200 hover:text-accent-blue"
+                className="group inline-flex items-center gap-4 transition-colors duration-200 hover:text-accent"
               >
                 {next.name}
                 <ArrowRight
                   aria-hidden
-                  className="size-6 text-foreground transition-[color,transform] duration-200 ease-out group-hover:translate-x-1.5 group-hover:text-accent-red"
+                  className="size-6 text-foreground transition-[color,transform] duration-200 ease-out group-hover:translate-x-1.5 group-hover:text-accent-strong"
                   strokeWidth={1.5}
                 />
               </Link>
