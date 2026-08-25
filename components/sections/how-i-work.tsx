@@ -12,15 +12,17 @@ export function HowIWork() {
   return (
     <section id="como-trabalho" className="bg-background">
       <Container className="py-section">
-        <Reveal className="grid gap-x-12 gap-y-6 lg:grid-cols-12">
+        <Reveal className="grid gap-x-12 gap-y-6 border-b border-border pb-10 sm:pb-12 lg:grid-cols-12">
           <h2 className="text-balance-title max-w-[16ch] text-heading-xl font-medium text-foreground lg:col-span-6">
             {howIWork.title}
           </h2>
-          <p className="max-w-[48ch] text-muted lg:col-span-6 lg:pt-2">{howIWork.lead}</p>
+          <p className="max-w-[48ch] text-muted lg:col-span-6 lg:border-l lg:border-border lg:py-2 lg:pl-12">
+            {howIWork.lead}
+          </p>
         </Reveal>
 
         {/* Como penso — três etapas, tipográficas, sem caixa. */}
-        <Reveal delay={80} className="mt-20">
+        <Reveal delay={80} className="mt-14 sm:mt-16 lg:mt-20">
           <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
             Como penso
           </p>
@@ -37,7 +39,7 @@ export function HowIWork() {
         </Reveal>
 
         {/* O que construo — quatro frentes, uma linha cada. */}
-        <Reveal delay={80} className="mt-20">
+        <Reveal delay={80} className="mt-14 sm:mt-16 lg:mt-20">
           <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
             O que construo
           </p>

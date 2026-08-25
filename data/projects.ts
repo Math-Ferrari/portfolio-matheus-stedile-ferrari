@@ -194,10 +194,12 @@ export const projects: Project[] = [
           layout: "single",
           items: [
             {
-              src: "",
+              src: "/screenshots/sistema/06.png",
               alt: "Dashboard do Sistema de Gestão PlatoTruck",
               caption: "Dashboard — visão geral da operação da empresa selecionada.",
               frame: "desktop",
+              width: 1891,
+              height: 953,
             },
           ],
         },
@@ -214,13 +216,15 @@ export const projects: Project[] = [
           kind: "screenshots",
           id: "tela-multiempresa",
           title: "Seleção de empresa",
-          layout: "single",
+          layout: "device",
           items: [
             {
-              src: "",
-              alt: "Tela de seleção de empresa no Sistema de Gestão PlatoTruck",
+              src: "/screenshots/sistema/08.png",
+              alt: "Seletor de empresa no Sistema de Gestão PlatoTruck",
               caption: "Troca de empresa dentro do sistema, sem precisar sair para outro ambiente.",
-              frame: "desktop",
+              frame: "mobile",
+              width: 253,
+              height: 495,
             },
           ],
         },
@@ -237,19 +241,23 @@ export const projects: Project[] = [
           kind: "screenshots",
           id: "tela-estoque",
           title: "Produtos e movimentações",
-          layout: "pair",
+          layout: "single",
           items: [
             {
-              src: "",
+              src: "/screenshots/sistema/10.png",
               alt: "Tela de cadastro de produtos e inventário",
               caption: "Produtos e inventário — saldos por local.",
               frame: "desktop",
+              width: 1887,
+              height: 944,
             },
             {
-              src: "",
+              src: "/screenshots/sistema/10.1.png",
               alt: "Tela de histórico de movimentações, entradas e transferências",
               caption: "Movimentações — entradas, retiradas e transferências entre locais.",
               frame: "desktop",
+              width: 1889,
+              height: 933,
             },
           ],
         },
@@ -268,10 +276,12 @@ export const projects: Project[] = [
           layout: "single",
           items: [
             {
-              src: "",
-              alt: "Tela de retirada de produtos por scanner, em uso durante a operação",
-              caption: "Leitura do código do produto na retirada — sem digitação manual.",
-              frame: "mobile",
+              src: "/screenshots/sistema/12.png",
+              alt: "Tela de retirada rápida de produtos por QR Code",
+              caption: "Retirada rápida — leitura por QR Code ou busca manual antes de finalizar.",
+              frame: "desktop",
+              width: 1904,
+              height: 944,
             },
           ],
         },
@@ -291,10 +301,12 @@ export const projects: Project[] = [
           layout: "single",
           items: [
             {
-              src: "",
-              alt: "Tela de gestão de usuários e permissões",
-              caption: "Usuários e níveis de acesso, no escopo da empresa selecionada.",
+              src: "/screenshots/sistema/14.png",
+              alt: "Tela de criação de usuário, perfis e empresas permitidas",
+              caption: "Criação de usuário — perfis, setores e empresas permitidas.",
               frame: "desktop",
+              width: 1885,
+              height: 942,
             },
           ],
         },
@@ -308,16 +320,92 @@ export const projects: Project[] = [
           ],
         },
         {
-          kind: "pending",
+          kind: "list",
           id: "decisoes-tecnicas",
           title: "Decisões técnicas",
-          note: "Seção reservada para as decisões de arquitetura e seus motivos (modelagem de estoque, escopo por empresa, estratégia de permissões). Conteúdo a ser preenchido com base no sistema real.",
+          variant: "plain",
+          intro:
+            "O sistema foi construído para atender uma operação real, com múltiplas empresas, diferentes perfis de acesso e movimentações de estoque que precisam manter consistência e rastreabilidade.",
+          items: [
+            {
+              title: "Arquitetura multiempresa",
+              description:
+                "O acesso aos dados é condicionado às empresas liberadas para cada usuário. A empresa selecionada define o escopo das operações, evitando que informações de unidades diferentes sejam misturadas durante consultas e movimentações.",
+            },
+            {
+              title: "Autorização em múltiplas camadas",
+              description:
+                "As permissões não dependem apenas da interface. Regras de acesso também são validadas no servidor e no banco de dados, reduzindo o risco de uma ação ser executada apenas por manipulação do frontend.",
+            },
+            {
+              title: "Estoque baseado em movimentações",
+              description:
+                "Em vez de tratar o estoque apenas como um número editável, entradas, retiradas e transferências são registradas como movimentações. Isso permite manter histórico, origem, destino e rastreabilidade das alterações de saldo.",
+            },
+            {
+              title: "Operações críticas com comportamento fail-closed",
+              description:
+                "Funcionalidades que ainda não estavam prontas para uso real foram bloqueadas por padrão. A decisão foi liberar módulos gradualmente, evitando que partes incompletas do sistema fossem utilizadas na operação.",
+            },
+            {
+              title: "Processamento próximo ao banco",
+              description:
+                "Consultas mais pesadas, como filtros e indicadores do inventário, foram movidas para operações otimizadas no PostgreSQL através de RPCs e consultas específicas, reduzindo processamento desnecessário no cliente e melhorando o tempo de resposta.",
+            },
+            {
+              title: "Evolução sem perder rastreabilidade",
+              description:
+                "Alterações importantes de estoque, migrações de saldos e ajustes operacionais foram estruturados para preservar histórico e permitir validação dos dados antes e depois das mudanças.",
+            },
+          ],
         },
         {
-          kind: "pending",
+          kind: "list",
           id: "tecnologias",
           title: "Tecnologias",
-          note: "Stack do sistema a ser confirmada e listada aqui.",
+          variant: "plain",
+          items: [
+            {
+              title: "Next.js",
+              description:
+                "Estrutura principal da aplicação web, utilizando App Router para organização das páginas e fluxos do sistema.",
+            },
+            {
+              title: "React",
+              description:
+                "Construção das interfaces e componentes utilizados nos módulos operacionais.",
+            },
+            {
+              title: "TypeScript",
+              description:
+                "Tipagem da aplicação e dos principais fluxos de dados, reduzindo inconsistências durante o desenvolvimento.",
+            },
+            {
+              title: "Supabase",
+              description:
+                "Infraestrutura de backend utilizada para autenticação, banco de dados e integração entre a aplicação e os dados operacionais.",
+            },
+            {
+              title: "PostgreSQL",
+              description:
+                "Banco relacional responsável pelos produtos, saldos, movimentações, usuários, empresas, permissões e demais dados do sistema.",
+            },
+            {
+              title: "Row Level Security",
+              description:
+                "Políticas de segurança no banco utilizadas como uma camada adicional de controle de acesso aos dados.",
+            },
+            {
+              title: "PostgreSQL RPC",
+              description:
+                "Funções utilizadas para operações e consultas que exigem maior controle, consistência ou desempenho diretamente no banco.",
+            },
+            {
+              title: "Vercel",
+              description:
+                "Hospedagem e entrega da aplicação web em produção.",
+            },
+          ],
         },
         {
           kind: "list",
@@ -394,7 +482,7 @@ export const projects: Project[] = [
     case: {
       intro: [
         "tudoPrabarco é uma plataforma e marketplace digital do setor náutico, onde usuários e empresas se encontram, se comunicam e fecham serviços.",
-        "Minha atuação no projeto é de desenvolvimento Full Stack, cobrindo tanto a aplicação quanto a camada de dados e autenticação.",
+        "Minha atuação foi end-to-end, acompanhando a construção do produto da experiência e das interfaces às funcionalidades, integrações e camadas de dados que sustentam seus fluxos.",
       ],
       blocks: [
         {
@@ -404,6 +492,14 @@ export const projects: Project[] = [
           paragraphs: [
             "A plataforma reúne, em um mesmo produto, cadastro e gestão de usuários e empresas, um catálogo de prestadores e as funcionalidades que sustentam a relação entre as duas pontas: busca, avaliação, conversa e pagamento.",
             "Um produto com esse formato exige atenção a permissões desde o início: usuário, empresa e prestador acessam coisas diferentes, e as regras precisam valer no servidor e na camada de dados.",
+          ],
+        },
+        {
+          kind: "prose",
+          id: "atuacao-no-projeto",
+          title: "Atuação no projeto",
+          paragraphs: [
+            "Participei da construção do tudoPrabarco como produto, não apenas de telas isoladas. O trabalho atravessou a definição e implementação dos fluxos usados por usuários e empresas, a construção das interfaces e as integrações necessárias para que cadastro, descoberta, comunicação e operação funcionassem de ponta a ponta.",
           ],
         },
         {
@@ -442,6 +538,60 @@ export const projects: Project[] = [
           ],
         },
         {
+          kind: "screenshots",
+          id: "explorar-plataforma",
+          title: "Explorar a plataforma",
+          intro:
+            "A descoberta reúne busca, filtros e catálogo de empresas em um mesmo fluxo, ajudando o usuário a navegar pela oferta de serviços náuticos.",
+          layout: "single",
+          items: [
+            {
+              src: "/screenshots/tudoprabarco/05.png",
+              alt: "Tela de busca de empresas náuticas com filtros e catálogo de prestadores",
+              caption: "Explorar — busca, filtros e catálogo de empresas náuticas.",
+              frame: "desktop",
+              width: 1891,
+              height: 940,
+            },
+          ],
+        },
+        {
+          kind: "screenshots",
+          id: "categorias-e-descoberta",
+          title: "Categorias e descoberta",
+          intro:
+            "As categorias organizam a navegação por necessidade e dão continuidade ao fluxo de descoberta iniciado na busca.",
+          layout: "single",
+          items: [
+            {
+              src: "/screenshots/tudoprabarco/05.01.png",
+              alt: "Tela com categorias de serviços náuticos organizadas em uma grade visual",
+              caption: "Categorias — serviços organizados por necessidade da embarcação.",
+              frame: "desktop",
+              width: 1887,
+              height: 940,
+            },
+          ],
+        },
+        {
+          kind: "screenshots",
+          id: "acesso-a-plataforma",
+          title: "Acesso à plataforma",
+          intro:
+            "O fluxo de entrada também faz parte do produto, com criação de conta por e-mail ou autenticação pelo Google.",
+          layout: "single",
+          items: [
+            {
+              src: "/screenshots/tudoprabarco/1.png",
+              alt: "Tela de criação de conta do tudoPrabarco com cadastro por e-mail e Google",
+              caption: "Criar conta — cadastro por e-mail ou autenticação pelo Google.",
+              frame: "desktop",
+              width: 1900,
+              height: 942,
+            },
+          ],
+        },
+        {
           kind: "prose",
           id: "dados-e-acesso",
           title: "Dados e controle de acesso",
@@ -461,32 +611,37 @@ export const projects: Project[] = [
             { label: "Ferramentas", items: ["Git / GitHub"] },
           ],
         },
+
         {
-          kind: "screenshots",
-          id: "telas",
-          title: "Telas",
-          intro: "Screenshots reais serão adicionadas aqui.",
-          layout: "pair",
-          items: [
-            {
-              src: "",
-              alt: "Catálogo de prestadores da plataforma tudoPrabarco",
-              caption: "Catálogo — busca e filtros de prestadores.",
-              frame: "desktop",
-            },
-            {
-              src: "",
-              alt: "Tela de chat da plataforma tudoPrabarco",
-              caption: "Chat — comunicação entre usuário e prestador.",
-              frame: "desktop",
-            },
-          ],
-        },
-        {
-          kind: "pending",
+          kind: "results",
           id: "resultados",
           title: "Resultados",
-          note: "Seção reservada para resultados do produto. Será preenchida quando houver informação verificada — sem números estimados.",
+          items: [
+            {
+              label: "Plataforma completa",
+              title: "Plataforma construída de ponta a ponta",
+              description:
+                "O projeto evoluiu para uma plataforma web completa, conectando usuários, empresas e prestadores de serviços dentro de uma mesma experiência digital.",
+            },
+            {
+              label: "Jornada integrada",
+              title: "Jornada integrada do usuário",
+              description:
+                "Fluxos de cadastro, autenticação, descoberta por categorias, busca e navegação foram estruturados para funcionar como partes de um único produto, e não como páginas isoladas.",
+            },
+            {
+              label: "Base para evolução",
+              title: "Base técnica para evolução do produto",
+              description:
+                "A aplicação foi estruturada com frontend, backend, banco de dados e controle de acesso integrados, permitindo que novas funcionalidades fossem incorporadas sem reconstruir a base do sistema.",
+            },
+            {
+              label: "Atuação end-to-end",
+              title: "Participação end-to-end",
+              description:
+                "Atuei nas diferentes camadas da plataforma, desde interfaces e experiência do usuário até regras de negócio, APIs, dados e integrações, acompanhando a evolução do produto de forma ampla.",
+            },
+          ],
         },
       ],
     },
@@ -537,34 +692,67 @@ export const projects: Project[] = [
           kind: "screenshots",
           id: "telas",
           title: "Telas",
-          intro: "Screenshots reais serão adicionadas aqui, incluindo a versão mobile.",
           layout: "device",
           items: [
             {
-              src: "",
+              src: "/screenshots/platotruck/02.png",
               alt: "Página inicial do site PlatoTruck.com em desktop",
               caption: "Home — versão desktop.",
               frame: "desktop",
+              width: 1889,
+              height: 937,
             },
             {
-              src: "",
+              src: "/screenshots/platotruck/02.1.png",
               alt: "Página inicial do site PlatoTruck.com em mobile",
               caption: "Home — versão mobile.",
               frame: "mobile",
+              width: 386,
+              height: 844,
             },
           ],
         },
         {
-          kind: "pending",
+          kind: "tech",
           id: "tecnologias",
           title: "Tecnologias",
-          note: "Stack do site a ser confirmada e listada aqui.",
+          groups: [
+            { label: "Frontend", items: ["Next.js", "React", "TypeScript"] },
+            { label: "Interface", items: ["Tailwind CSS"] },
+            { label: "Entrega", items: ["Vercel"] },
+          ],
         },
         {
-          kind: "pending",
+          kind: "results",
           id: "resultados",
           title: "Resultados",
-          note: "Seção reservada para resultados. Dados de acessos, SEO ou performance só entram aqui quando forem medidos.",
+          wideLabels: true,
+          items: [
+            {
+              label: "Presença digital",
+              title: "Presença institucional estruturada",
+              description:
+                "A empresa passou a contar com um site próprio para apresentar sua atuação, seus produtos e sua especialização no mercado de embreagens para linha pesada.",
+            },
+            {
+              label: "Organização da informação",
+              title: "Conteúdo organizado para o cliente",
+              description:
+                "Produtos, informações institucionais e principais áreas da empresa foram estruturados em uma navegação clara, facilitando o entendimento sobre o que a PlatoTruck oferece.",
+            },
+            {
+              label: "Experiência responsiva",
+              title: "Experiência adaptada a diferentes telas",
+              description:
+                "A interface foi desenvolvida para funcionar de forma consistente em desktop e dispositivos móveis, preservando hierarquia, conteúdo e facilidade de navegação.",
+            },
+            {
+              label: "Base para evolução",
+              title: "Base digital preparada para evolução",
+              description:
+                "O projeto criou uma estrutura própria para a presença digital da empresa, permitindo que novas páginas, produtos e conteúdos possam ser incorporados conforme o site evolui.",
+            },
+          ],
         },
       ],
     },

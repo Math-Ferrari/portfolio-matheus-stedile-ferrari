@@ -1,9 +1,10 @@
+import { ImageLightboxProvider } from "@/components/projects/image-lightbox";
 import { ScreenshotGroup } from "@/components/projects/screenshot";
 import { CaseSection } from "@/components/projects/case/case-section";
 import type { Tone } from "@/components/ui/tone";
 import { Reveal } from "@/components/ui/reveal";
-import type { CaseBlock } from "@/lib/types";
-import { toIndexLabel } from "@/lib/utils";
+import type { CaseBlock, Screenshot } from "@/lib/types";
+import { cn, toIndexLabel } from "@/lib/utils";
 
 /** Molduras de screenshot alternam entre estes dois tons — cada bloco de
     telas do case lê como uma cena própria, não a mesma superfície repetida
@@ -12,7 +13,15 @@ import { toIndexLabel } from "@/lib/utils";
 const SCREENSHOT_TONES: Tone[] = ["elevated", "slate"];
 
 /** Renderiza o conteúdo de um bloco, sem o cabeçalho da seção. */
-function BlockBody({ block, screenshotTone }: { block: CaseBlock; screenshotTone: Tone }) {
+function BlockBody({
+  block,
+  screenshotTone,
+  lightboxIndices,
+}: {
+  block: CaseBlock;
+  screenshotTone: Tone;
+  lightboxIndices?: Array<number | null>;
+}) {
   switch (block.kind) {
     case "prose":
       return (
@@ -102,7 +111,14 @@ function BlockBody({ block, screenshotTone }: { block: CaseBlock; screenshotTone
       );
 
     case "screenshots":
-      return <ScreenshotGroup layout={block.layout} items={block.items} tone={screenshotTone} />;
+      return (
+        <ScreenshotGroup
+          layout={block.layout}
+          items={block.items}
+          tone={screenshotTone}
+          lightboxIndices={lightboxIndices}
+        />
+      );
 
     case "tech":
       return (
@@ -125,6 +141,36 @@ function BlockBody({ block, screenshotTone }: { block: CaseBlock; screenshotTone
         </dl>
       );
 
+    case "results":
+      return (
+        <ol className="border-t border-border">
+          {block.items.map((item, index) => (
+            <li key={item.label} className="border-b border-border py-7 sm:py-9">
+              <div
+                className={cn(
+                  "grid gap-5 sm:gap-10",
+                  block.wideLabels
+                    ? "sm:grid-cols-[18rem_minmax(0,1fr)]"
+                    : "sm:grid-cols-[15rem_minmax(0,1fr)]",
+                )}
+              >
+                <p className="grid grid-cols-[1.5rem_0.5rem_minmax(0,1fr)] items-baseline gap-x-2 text-caption font-medium uppercase tracking-[0.16em] text-muted">
+                  <span aria-hidden className="nums-tabular text-accent">
+                    {toIndexLabel(index)}
+                  </span>
+                  <span aria-hidden>/</span>
+                  <span className="whitespace-nowrap">{item.label}</span>
+                </p>
+                <div className="min-w-0">
+                  <h3 className="text-heading-md font-medium text-foreground">{item.title}</h3>
+                  <p className="mt-3 max-w-[58ch] text-body text-muted">{item.description}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      );
+
     case "pending":
       return (
         <div className="max-w-[62ch] rounded-md border border-dashed border-border bg-surface-elevated p-6">
@@ -142,6 +188,30 @@ type CaseBlocksProps = {
 };
 
 export function CaseBlocks({ blocks }: CaseBlocksProps) {
+  const gallery = blocks.reduce<{
+    images: Screenshot[];
+    indicesByBlock: Array<Array<number | null>>;
+  }>(
+    (acc, block) => {
+      if (block.kind !== "screenshots") {
+        return { ...acc, indicesByBlock: [...acc.indicesByBlock, []] };
+      }
+
+      let nextIndex = acc.images.length;
+      const indices = block.items.map((item) => {
+        if (!item.src) return null;
+        const index = nextIndex;
+        nextIndex += 1;
+        return index;
+      });
+
+      return {
+        images: [...acc.images, ...block.items.filter((item) => item.src)],
+        indicesByBlock: [...acc.indicesByBlock, indices],
+      };
+    },
+    { images: [], indicesByBlock: [] },
+  );
   /* Índice só entre os blocos "screenshots" (não a posição no array inteiro),
      derivado funcionalmente — nenhuma variável mutada durante o render. */
   const screenshotToneByBlockIndex = blocks.reduce<{ count: number; indices: number[] }>(
@@ -153,25 +223,31 @@ export function CaseBlocks({ blocks }: CaseBlocksProps) {
   ).indices;
 
   return (
-    <div className="flex flex-col gap-20">
-      {blocks.map((block, index) => {
-        const screenshotOrdinal = screenshotToneByBlockIndex[index] ?? -1;
-        const screenshotTone =
-          SCREENSHOT_TONES[screenshotOrdinal % SCREENSHOT_TONES.length] ?? "elevated";
+    <ImageLightboxProvider images={gallery.images}>
+      <div className="flex flex-col gap-20">
+        {blocks.map((block, index) => {
+          const screenshotOrdinal = screenshotToneByBlockIndex[index] ?? -1;
+          const screenshotTone =
+            SCREENSHOT_TONES[screenshotOrdinal % SCREENSHOT_TONES.length] ?? "elevated";
 
-        return (
-          <Reveal key={block.id}>
-            <CaseSection
-              id={block.id}
-              index={toIndexLabel(index)}
-              title={block.title}
-              intro={"intro" in block ? block.intro : undefined}
-            >
-              <BlockBody block={block} screenshotTone={screenshotTone} />
-            </CaseSection>
-          </Reveal>
-        );
-      })}
-    </div>
+          return (
+            <Reveal key={block.id}>
+              <CaseSection
+                id={block.id}
+                index={toIndexLabel(index)}
+                title={block.title}
+                intro={"intro" in block ? block.intro : undefined}
+              >
+                <BlockBody
+                  block={block}
+                  screenshotTone={screenshotTone}
+                  lightboxIndices={gallery.indicesByBlock[index]}
+                />
+              </CaseSection>
+            </Reveal>
+          );
+        })}
+      </div>
+    </ImageLightboxProvider>
   );
 }

@@ -35,6 +35,12 @@ export type ListEntry = {
   description?: string;
 };
 
+export type ResultEntry = {
+  label: string;
+  title: string;
+  description: string;
+};
+
 export type ListGroup = {
   label: string;
   items: string[];
@@ -87,6 +93,15 @@ export type CaseBlock =
       title: string;
       intro?: string;
       groups: TechGroup[];
+    }
+  | {
+      /** Resultados qualitativos apresentados como uma lista editorial vertical. */
+      kind: "results";
+      id: string;
+      title: string;
+      /** Reserva mais espaço para labels editoriais longos no desktop. */
+      wideLabels?: boolean;
+      items: ResultEntry[];
     }
   | {
       /** Seção estruturada, mas ainda sem conteúdo confirmado. */

@@ -118,7 +118,7 @@ export function SiteHeader() {
             aria-label={`${site.name}, ir para a página inicial`}
             aria-current={pathname === "/" ? "page" : undefined}
             className={cn(
-              "block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[clamp(0.72rem,0.64rem+0.28vw,0.9rem)] font-medium tracking-[-0.015em] text-foreground/80 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
+              "inline-flex min-h-11 max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap text-[clamp(0.72rem,0.64rem+0.28vw,0.9rem)] font-medium tracking-[-0.015em] text-foreground/80 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
               heroLegibility,
             )}
           >

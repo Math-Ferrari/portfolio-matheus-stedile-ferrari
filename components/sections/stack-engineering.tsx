@@ -38,7 +38,7 @@ export function StackEngineering() {
           </Reveal>
 
           {/* Engenharia — princípios, sem um parágrafo por item. */}
-          <Reveal delay={80} className="lg:col-span-5">
+          <Reveal delay={80} className="lg:col-span-5 lg:border-l lg:border-border lg:pl-12">
             <h2 className="text-heading-xl font-medium text-foreground">Engenharia</h2>
 
             <p className="mt-6 max-w-[40ch] text-muted">{engineering.title}</p>

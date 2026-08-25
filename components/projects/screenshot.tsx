@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 
+import { useImageLightbox } from "@/components/projects/image-lightbox";
 import type { Tone } from "@/components/ui/tone";
 import type { Screenshot } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -73,7 +76,7 @@ export function ScreenshotFrame({
     return (
       <div
         className={cn(
-          "overflow-hidden",
+          "w-full min-w-0 max-w-full overflow-hidden",
           bare ? "rounded-none" : "rounded-md border",
           frameByTone[tone],
           className,
@@ -86,7 +89,7 @@ export function ScreenshotFrame({
           height={screenshot.height}
           sizes={sizes}
           priority={priority}
-          className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.01]"
+          className="h-auto w-full max-w-full transition-transform duration-500 ease-out group-hover:scale-[1.01]"
         />
       </div>
     );
@@ -124,7 +127,9 @@ export function ScreenshotFrame({
   );
 }
 
-type FigureProps = FrameProps;
+type FigureProps = FrameProps & {
+  lightboxIndex?: number;
+};
 
 /** Screenshot com legenda curta explicando o que aquela tela resolve. */
 export function ScreenshotFigure({
@@ -133,15 +138,38 @@ export function ScreenshotFigure({
   sizes,
   tone = "elevated",
   className,
+  lightboxIndex,
 }: FigureProps) {
+  const lightbox = useImageLightbox();
+  const canOpen = Boolean(screenshot.src && lightbox && lightboxIndex !== undefined);
+  const frame = (
+    <ScreenshotFrame
+      screenshot={screenshot}
+      priority={priority}
+      sizes={sizes}
+      tone={tone}
+    />
+  );
+
   return (
     <figure className={cn("group flex flex-col", className)}>
-      <ScreenshotFrame
-        screenshot={screenshot}
-        priority={priority}
-        sizes={sizes}
-        tone={tone}
-      />
+      {canOpen ? (
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-label={`Ampliar imagem: ${screenshot.caption ?? screenshot.alt}`}
+          onClick={(event) => {
+            if (lightbox && lightboxIndex !== undefined) {
+              lightbox.open(lightboxIndex, event.currentTarget);
+            }
+          }}
+          className="relative block w-full cursor-zoom-in rounded-md text-left transition-[filter] duration-300 hover:brightness-[1.025] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          {frame}
+        </button>
+      ) : (
+        frame
+      )}
       {screenshot.caption ? (
         <figcaption className="mt-4 border-t border-border pt-3 text-sm text-muted">
           {screenshot.caption}
@@ -155,10 +183,16 @@ type GroupProps = {
   layout: "single" | "pair" | "device";
   items: Screenshot[];
   tone?: Tone;
+  lightboxIndices?: Array<number | null>;
 };
 
 /** Composições de screenshots: uma grande, duas lado a lado, ou desktop + mobile. */
-export function ScreenshotGroup({ layout, items, tone = "elevated" }: GroupProps) {
+export function ScreenshotGroup({
+  layout,
+  items,
+  tone = "elevated",
+  lightboxIndices,
+}: GroupProps) {
   if (layout === "device") {
     const desktop = items.find((item) => item.frame !== "mobile");
     const mobile = items.find((item) => item.frame === "mobile");
@@ -170,6 +204,7 @@ export function ScreenshotGroup({ layout, items, tone = "elevated" }: GroupProps
             screenshot={desktop}
             tone={tone}
             sizes="(min-width: 768px) 60vw, 100vw"
+            lightboxIndex={lightboxIndices?.[items.indexOf(desktop)] ?? undefined}
           />
         ) : null}
         {mobile ? (
@@ -178,6 +213,7 @@ export function ScreenshotGroup({ layout, items, tone = "elevated" }: GroupProps
             tone={tone}
             sizes="(min-width: 768px) 30vw, 100vw"
             className="mx-auto w-full max-w-[17rem] md:mx-0"
+            lightboxIndex={lightboxIndices?.[items.indexOf(mobile)] ?? undefined}
           />
         ) : null}
       </div>
@@ -187,12 +223,13 @@ export function ScreenshotGroup({ layout, items, tone = "elevated" }: GroupProps
   if (layout === "pair") {
     return (
       <div className="grid gap-8 md:grid-cols-2">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <ScreenshotFigure
             key={item.alt}
             screenshot={item}
             tone={tone}
             sizes="(min-width: 768px) 45vw, 100vw"
+            lightboxIndex={lightboxIndices?.[index] ?? undefined}
           />
         ))}
       </div>
@@ -208,6 +245,7 @@ export function ScreenshotGroup({ layout, items, tone = "elevated" }: GroupProps
           tone={tone}
           priority={index === 0}
           sizes="(min-width: 1024px) 70vw, 100vw"
+          lightboxIndex={lightboxIndices?.[index] ?? undefined}
         />
       ))}
     </div>

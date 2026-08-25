@@ -33,9 +33,9 @@ export function CaseHeader({ project }: CaseHeaderProps) {
           Projetos
         </Link>
 
-        <div className="mt-10 grid items-center gap-x-12 gap-y-12 lg:grid-cols-12">
-          <div className="lg:col-span-6">
-            <p className="rise rise-1 flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
+        <div className="mt-10 grid min-w-0 grid-cols-[minmax(0,1fr)] items-center gap-x-12 gap-y-12 lg:grid-cols-12">
+          <div className="min-w-0 lg:col-span-6">
+            <p className="rise rise-1 flex min-w-0 flex-wrap items-center gap-3 text-caption font-medium uppercase leading-relaxed tracking-[0.18em] text-muted">
               <span aria-hidden className="h-px w-6 bg-accent" />
               {project.kind} — {project.role}
             </p>
@@ -61,12 +61,12 @@ export function CaseHeader({ project }: CaseHeaderProps) {
             ) : null}
           </div>
 
-          <div className="lg:col-span-6">
+          <div className="min-w-0 lg:col-span-6">
             <FramedVisual
               screenshot={project.cover}
               priority
               sizes="(min-width: 1024px) 46vw, 100vw"
-              className="rise-visual mx-auto max-w-[34rem] lg:max-w-none"
+              className="rise-visual mx-auto w-full min-w-0 max-w-[34rem] lg:max-w-none"
             />
           </div>
         </div>

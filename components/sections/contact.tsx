@@ -12,7 +12,7 @@ export function Contact() {
   return (
     <section
       id="contato"
-      className="flex min-h-[70vh] flex-col justify-center bg-background"
+      className="flex flex-col justify-center bg-background md:min-h-[70vh]"
     >
       <Container className="py-section">
         <Reveal>
@@ -25,13 +25,18 @@ export function Contact() {
 
           {primaryContact ? (
             <div className="mt-12 flex flex-col gap-6">
-              <ActionLink href={primaryContact.href} variant="quiet" external className="text-xl">
+              <ActionLink
+                href={primaryContact.href}
+                variant="quiet"
+                external
+                className="min-h-11 text-xl"
+              >
                 {contact.cta}
               </ActionLink>
 
               <a
                 href={primaryContact.href}
-                className="w-fit text-muted transition-colors duration-200 hover:text-accent"
+                className="inline-flex min-h-11 w-fit items-center text-muted transition-colors duration-200 hover:text-accent"
               >
                 {primaryContact.display || primaryContact.label}
               </a>

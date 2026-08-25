@@ -1,39 +1,17 @@
 import Image from "next/image";
 
+
 import { profile, site } from "@/data/site";
-
-const headingStyle: React.CSSProperties = {
-  opacity: "var(--tp-profile-heading, 0)",
-  transform:
-    "translate3d(calc(3vw * (1 - var(--tp-profile-heading, 0))), calc(28px * (1 - var(--tp-profile-heading, 0))), 0) scale(calc(0.98 + 0.02 * var(--tp-profile-heading, 0)))",
-  transformOrigin: "left bottom",
-  willChange: "opacity, transform",
-};
-
-const detailsStyle: React.CSSProperties = {
-  opacity: "var(--tp-profile-details, 0)",
-  transform:
-    "translate3d(0, calc(24px * (1 - var(--tp-profile-details, 0))), 0)",
-  willChange: "opacity, transform",
-};
-
-const portraitStyle: React.CSSProperties = {
-  opacity: "var(--tp-profile-portrait, 0)",
-  transform:
-    "translate3d(calc(4vw * (1 - var(--tp-profile-portrait, 0))), 0, 0) scale(calc(1.035 - 0.035 * var(--tp-profile-portrait, 0)))",
-  transformOrigin: "right center",
-  willChange: "opacity, transform",
-};
 
 function ProfileHeading() {
   return (
-    <div className="md:col-span-7" style={headingStyle}>
+    <div className="hero-profile-heading md:col-span-7">
       <div className="mb-3 flex items-center gap-3 sm:mb-5">
         <span aria-hidden className="h-px w-8 bg-accent-soft" />
         <p className="text-caption font-semibold uppercase tracking-[0.22em] text-muted">
           {profile.eyebrow}
         </p>
-        <span className="ml-auto hidden text-[0.68rem] font-medium uppercase tracking-[0.2em] text-foreground/35 sm:block">
+        <span className="ml-auto shrink-0 text-[0.62rem] font-medium uppercase tracking-[0.16em] text-foreground/35 sm:text-[0.68rem] sm:tracking-[0.2em]">
           01 / Perfil
         </span>
       </div>
@@ -67,8 +45,7 @@ function ProfileHeading() {
 function ProfilePortrait() {
   return (
     <figure
-      className="group relative h-[clamp(9rem,18svh,14rem)] overflow-hidden border border-foreground/10 bg-surface sm:h-[clamp(18rem,34svh,24rem)] md:col-span-5 md:col-start-8 md:row-span-3 md:row-start-1 md:h-[clamp(31rem,72svh,48rem)]"
-      style={portraitStyle}
+      className="hero-profile-portrait group relative aspect-[4/5] w-full overflow-hidden border border-foreground/10 bg-surface md:col-span-5 md:col-start-8 md:row-span-3 md:row-start-1 md:aspect-auto md:h-[clamp(31rem,72svh,48rem)]"
     >
       <Image
         src="/foto.jpeg"
@@ -107,15 +84,15 @@ function ProfilePortrait() {
 
 function ProfileSpecialties() {
   return (
-    <div className="md:col-span-7 md:self-end" style={detailsStyle}>
+    <div className="hero-profile-details md:col-span-7 md:self-end">
       <p className="mb-2 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-foreground/45 sm:mb-3 sm:text-[0.65rem]">
         Especialidades
       </p>
-      <ul className="grid grid-cols-2 border-y border-foreground/10 sm:grid-cols-3">
+      <ul className="grid grid-cols-1 border-y border-foreground/10 sm:grid-cols-3">
         {profile.keywords.map((keyword, index) => (
           <li
             key={keyword}
-            className="flex min-h-9 items-center gap-2 border-foreground/10 py-2 pr-2 text-[0.62rem] font-medium uppercase tracking-[0.06em] text-foreground/75 sm:min-h-12 sm:pr-3 sm:text-xs sm:tracking-[0.08em] [&:nth-child(2n)]:border-l [&:nth-child(2n)]:pl-3 sm:[&:nth-child(2n)]:border-l-0 sm:[&:nth-child(2n)]:pl-0 sm:[&:not(:nth-child(3n+1))]:border-l sm:[&:not(:nth-child(3n+1))]:pl-4"
+            className="flex min-h-11 items-center gap-3 border-foreground/10 py-2.5 pr-2 text-[0.66rem] font-medium uppercase tracking-[0.07em] text-foreground/75 [&:not(:first-child)]:border-t sm:min-h-12 sm:gap-2 sm:border-t-0 sm:py-2 sm:pr-3 sm:text-xs sm:tracking-[0.08em] sm:[&:nth-child(2n)]:border-l-0 sm:[&:nth-child(2n)]:pl-0 sm:[&:not(:nth-child(3n+1))]:border-l sm:[&:not(:nth-child(3n+1))]:pl-4"
           >
             <span className="font-serif text-xs italic text-accent">
               {String(index + 1).padStart(2, "0")}
@@ -131,11 +108,8 @@ function ProfileSpecialties() {
 /**
  * A apresentação final da transformação da hero. O conteúdo continua dentro
  * da mesma cena sticky da capa; headline, retrato e detalhes assumem o quadro
- * em fases ordenadas por `HeroTransition`.
- *
- * A ordem no DOM também é a ordem de leitura no mobile: headline, texto,
- * retrato e especialidades. No desktop, o grid leva o retrato para a coluna
- * direita e o faz atravessar as três faixas de conteúdo da esquerda.
+ * em fases ordenadas por `HeroTransition`. No mobile, os mesmos elementos
+ * aparecem em fluxo normal, depois da capa, sem estado visual alternativo.
  */
 export function AboutIntro() {
   return (
@@ -146,19 +120,21 @@ export function AboutIntro() {
       {/* Antes havia dois glows radiais em verde atrás de toda a composição
           — exatamente o tipo de "mancha verde" que a seção não deve ter.
           Sobra só este filete neutro no topo, quase invisível, no espírito
-          de "linhas/divisores em branco com alpha muito baixo". */}
+          de "linhas/divisores em branco com alpha muito baixo". Só desktop:
+          amarrado a `--tp-profile-heading`, que só é aceso pela coreografia
+          de scroll (exclusiva de desktop). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-6 -inset-y-10 -z-10 overflow-hidden"
+        className="pointer-events-none absolute -inset-x-6 -inset-y-10 -z-10 hidden overflow-hidden md:block"
         style={{ opacity: "var(--tp-profile-heading, 0)" }}
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent" />
       </div>
 
-      <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:gap-y-5 md:grid-cols-12 md:grid-rows-[auto_auto_1fr] md:gap-x-8 md:gap-y-6 lg:gap-x-12 lg:gap-y-7 xl:gap-x-16">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-8 sm:gap-y-5 md:grid-cols-12 md:grid-rows-[auto_auto_1fr] md:gap-x-8 md:gap-y-6 lg:gap-x-12 lg:gap-y-7 xl:gap-x-16">
         <ProfileHeading />
 
-        <div className="md:col-span-7" style={detailsStyle}>
+        <div className="hero-profile-details md:col-span-7">
           <div className="grid gap-2.5 border-l border-foreground/15 pl-3 sm:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] sm:gap-7 sm:pl-6">
             <p className="max-w-[34rem] text-[0.88rem] font-medium leading-[1.42] text-foreground sm:text-[clamp(1rem,1.35vw,1.22rem)] sm:leading-[1.5]">
               {profile.intro}
@@ -172,6 +148,7 @@ export function AboutIntro() {
         <ProfilePortrait />
         <ProfileSpecialties />
       </div>
+
     </div>
   );
 }

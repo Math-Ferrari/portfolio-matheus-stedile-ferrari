@@ -53,11 +53,11 @@ export default async function ProjectPage({ params }: PageProps) {
 
       {project.case ? (
         <Container className="pb-section pt-8">
-          <div className="grid gap-x-10 gap-y-12 lg:grid-cols-12">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-12 lg:grid-cols-12">
             <div className="lg:col-span-3">
               <CaseToc blocks={project.case.blocks} />
             </div>
-            <div className="lg:col-span-8 lg:col-start-5">
+            <div className="min-w-0 lg:col-span-8 lg:col-start-5">
               <CaseBlocks blocks={project.case.blocks} />
             </div>
           </div>

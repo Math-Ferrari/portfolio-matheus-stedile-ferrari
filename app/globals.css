@@ -185,6 +185,9 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: calc(5rem + env(safe-area-inset-top));
+    scrollbar-color: color-mix(in oklch, var(--muted) 55%, transparent) var(--background);
+    scrollbar-width: thin;
     -webkit-text-size-adjust: 100%;
     /* Precisa estar na raiz: a rolagem do viewport é governada pelo <html>,
        então `clip` só no <body> não impede a barra horizontal. */
@@ -221,6 +224,24 @@
   ::selection {
     background-color: var(--accent-strong);
     color: #ffffff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid var(--background);
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--muted) 55%, transparent);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
   }
 
   /* A Lenis marca o <html> com esta classe assim que monta — evita suavizar
@@ -508,18 +529,63 @@
      interpolando 1:1 com o progresso, sem suavização de tempo por cima. */
 }
 
+/* A animação da camada de perfil pertence apenas à coreografia desktop.
+   No mobile, os mesmos elementos ficam visíveis em fluxo normal. */
+@media (min-width: 768px) {
+  .hero-profile-heading {
+    opacity: var(--tp-profile-heading, 0);
+    transform:
+      translate3d(
+        calc(3vw * (1 - var(--tp-profile-heading, 0))),
+        calc(28px * (1 - var(--tp-profile-heading, 0))),
+        0
+      )
+      scale(calc(0.98 + 0.02 * var(--tp-profile-heading, 0)));
+    transform-origin: left bottom;
+    will-change: opacity, transform;
+  }
+
+  .hero-profile-portrait {
+    opacity: var(--tp-profile-portrait, 0);
+    transform:
+      translate3d(
+        calc(4vw * (1 - var(--tp-profile-portrait, 0))),
+        0,
+        0
+      )
+      scale(calc(1.035 - 0.035 * var(--tp-profile-portrait, 0)));
+    transform-origin: right center;
+    will-change: opacity, transform;
+  }
+
+  .hero-profile-details {
+    opacity: var(--tp-profile-details, 0);
+    transform:
+      translate3d(
+        0,
+        calc(24px * (1 - var(--tp-profile-details, 0))),
+        0
+      );
+    will-change: opacity, transform;
+  }
+}
 /* CTA já invisível (opacity ~0, ver style inline em interactive-hero.tsx)
    não deveria continuar focável/clicável no meio da transição. */
 [data-past-cta="true"] .hero-transition-cta {
   pointer-events: none;
 }
 
-@media (max-width: 640px) {
+/* Abaixo de `md` (768px), a coreografia sticky vira fluxo natural: a capa
+   ocupa a primeira dobra e o perfil completo vem logo depois. É o mesmo DOM
+   do desktop; muda apenas a disposição das duas camadas. */
+@media (max-width: 767px) {
   .hero-transition-wrapper {
-    /* Mesmo raciocínio do desktop (ver acima), percurso mais curto no toque
-       — 175svh menos 100svh de sticky = ~75svh de percurso, ~26svh de hold.
-       A ordem visual permanece idêntica, só a distância física muda. */
-    height: var(--hero-transition-height, 175svh);
+    height: auto;
+  }
+
+  .hero-transition-sticky {
+    position: static;
+    height: auto;
   }
 }
 
@@ -532,7 +598,7 @@
    comuns (a maioria) fica do tamanho original, sem cap nenhum. Calibrado e
    testado até 664px de altura (ver auditoria da tarefa de recoloração da
    seção de perfil) — folga de ~10px do header nesse extremo. */
-@media (max-height: 820px) {
+@media (min-width: 768px) and (max-height: 820px) {
   #profile-title {
     font-size: clamp(2.1rem, min(7.1vw, 8svh), 6.4rem);
   }
@@ -548,7 +614,6 @@
   .hero-transition-sticky {
     position: static;
     height: auto;
-    min-height: 100svh;
   }
 
   /* Sem a transição rodando, a sobreposição vira empilhamento normal — nome
@@ -570,6 +635,19 @@
     filter: none !important;
     clip-path: none !important;
     -webkit-clip-path: none !important;
+  }
+}
+
+/* `min-height: 100svh` do bloco de reduced-motion acima preservado só para
+   desktop (o "sentimento de capa" mesmo parado) — combinado com
+   `@media (max-width: 767px)` acima, um visitante mobile com movimento
+   reduzido teria as DUAS regras concorrendo pela mesma propriedade, e a
+   última do arquivo venceria (min-height de volta, recriando o espaço vazio
+   que a correção mobile existe pra eliminar). Separado assim, cada
+   breakpoint gera exatamente uma decisão sobre `min-height`. */
+@media (prefers-reduced-motion: reduce) and (min-width: 768px) {
+  .hero-transition-sticky {
+    min-height: 100svh;
   }
 }
 

@@ -41,13 +41,22 @@ type InteractiveHeroProps = {
  * de duas interfaces: suporte, nome, headline, retrato e detalhes recebem
  * fases próprias e ordenadas. As custom properties são escritas no mesmo
  * frame do Lenis e consumidas sem re-render React.
+ *
+ * Capa e perfil compartilham exatamente o mesmo markup nos dois breakpoints.
+ * No desktop, as duas camadas ocupam a mesma célula e a coreografia de scroll
+ * faz a passagem entre elas. No mobile, entram no fluxo como dois quadros
+ * consecutivos: primeiro a capa, depois todo o conteúdo de `AboutIntro`.
  */
 export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseColorMorphRef }: InteractiveHeroProps) {
   const [firstName, ...restName] = site.name.split(" ");
 
   return (
-    <section id="hero" aria-labelledby="hero-title" className="relative flex h-full w-full flex-col items-center justify-center">
-      <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
+    <section
+      id="hero"
+      aria-labelledby="hero-title"
+      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center md:h-full md:min-h-0"
+    >
+      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[100svh] overflow-hidden md:inset-0 md:h-auto">
         <ThemedFloatingLines
           progressRef={progressRef}
           linesFadeRef={linesFadeRef}
@@ -58,9 +67,9 @@ export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseC
 
       {/* A célula compartilhada preserva continuidade espacial. Em movimento
           reduzido, ela volta a ser uma coluna normal via globals.css. */}
-      <div className="hero-stage grid w-full place-items-center px-6 text-center">
+      <div className="hero-stage grid w-full place-items-center px-6 text-center sm:px-8 md:px-6">
         <div
-          className="hero-primary-layer col-start-1 row-start-1 flex flex-col items-center"
+          className="hero-primary-layer col-start-1 row-start-1 flex min-h-[100svh] flex-col items-center justify-center md:min-h-0"
           style={{
             opacity: "var(--tp-hero-opacity, 1)",
             transform:
@@ -89,7 +98,7 @@ export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseC
               willChange: "transform, opacity",
             }}
           >
-            <div className="hero-rise hero-d4 mt-6 flex flex-col gap-1.5">
+            <div className="hero-rise hero-d4 mt-6 flex max-w-[22rem] flex-col gap-1.5 md:max-w-none">
             {/* Texto em `--foreground`, igual ao resto da hero — o gradiente
                 de marca anterior virou texto de leitura comum. O único
                 detalhe de cor é o separador entre cargo e atuação, em
@@ -126,7 +135,7 @@ export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseC
           </div>
         </div>
 
-        <div className="hero-profile-layer pointer-events-none col-start-1 row-start-1">
+        <div className="hero-profile-layer col-start-1 row-start-2 justify-self-stretch py-20 text-left sm:py-24 md:pointer-events-none md:col-start-1 md:row-start-1 md:justify-self-center md:py-0">
           <AboutIntro />
         </div>
       </div>

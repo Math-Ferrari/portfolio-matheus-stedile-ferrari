@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { BrandSignature } from "@/components/ui/brand-signature";
 import { Container } from "@/components/ui/container";
 import { activeContacts, nav, site } from "@/data/site";
 
@@ -12,7 +11,9 @@ export function SiteFooter() {
       <Container className="py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <BrandSignature className="text-[1.05rem]" />
+            <p className="text-[1.05rem] font-medium -tracking-[0.01em] text-foreground">
+              {site.name}
+            </p>
             <p className="mt-4 text-sm text-foreground">{site.positioning}</p>
           </div>
 
@@ -20,12 +21,12 @@ export function SiteFooter() {
             <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
               Navegação
             </p>
-            <ul className="mt-4 flex flex-col gap-2">
+            <ul className="mt-3 grid grid-cols-2 gap-x-6 sm:mt-4 lg:flex lg:flex-col lg:gap-1">
               {nav.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-foreground transition-colors duration-200 hover:text-accent"
+                    className="inline-flex min-h-11 items-center text-sm text-foreground transition-colors duration-200 hover:text-accent lg:min-h-0 lg:py-1"
                   >
                     {item.label}
                   </Link>
@@ -39,12 +40,12 @@ export function SiteFooter() {
               <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
                 Contato
               </p>
-              <ul className="mt-4 flex flex-col gap-2">
+              <ul className="mt-3 flex flex-col sm:mt-4">
                 {activeContacts.map((contact) => (
                   <li key={contact.label}>
                     <a
                       href={contact.href}
-                      className="text-sm text-foreground transition-colors duration-200 hover:text-accent"
+                      className="inline-flex min-h-11 items-center text-sm text-foreground transition-colors duration-200 hover:text-accent lg:min-h-0 lg:py-1"
                       {...(contact.href.startsWith("http")
                         ? { target: "_blank", rel: "noreferrer noopener" }
                         : {})}
