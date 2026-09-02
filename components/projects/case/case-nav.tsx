@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
+import { useContent } from "@/components/i18n/use-content";
 
 import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
@@ -17,9 +21,11 @@ type CaseNavProps = {
  * auditoria corrigiu na home).
  */
 export function CaseNav({ next }: CaseNavProps) {
+  const { ui } = useContent();
+
   return (
     <section
-      aria-label="Continuar navegando"
+      aria-label={ui.case.keepBrowsing}
       className="border-t border-border bg-background"
     >
       <Container className="py-16">
@@ -27,7 +33,7 @@ export function CaseNav({ next }: CaseNavProps) {
           <div>
             <p className="flex items-center gap-3 text-caption font-medium uppercase tracking-[0.18em] text-muted">
               <span aria-hidden className="h-px w-6 bg-accent" />
-              Próximo projeto
+              {ui.case.nextProject}
             </p>
             <h2 className="mt-5 text-heading-lg font-medium -tracking-[0.03em] text-foreground">
               <Link
@@ -46,7 +52,7 @@ export function CaseNav({ next }: CaseNavProps) {
           </div>
 
           <ActionLink href="/projetos" variant="secondary">
-            Todos os projetos
+            {ui.case.allProjects}
           </ActionLink>
         </Reveal>
       </Container>

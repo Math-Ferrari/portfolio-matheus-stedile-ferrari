@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og";
 
-import { hero, site } from "@/data/site";
+import { defaultContent } from "@/data/content";
 import { splitHighlight } from "@/lib/utils";
+
+const { hero, site } = defaultContent;
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

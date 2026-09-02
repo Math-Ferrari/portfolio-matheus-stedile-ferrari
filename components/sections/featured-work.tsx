@@ -1,9 +1,13 @@
+"use client";
+
+import { useLanguage } from "@/components/i18n/language-provider";
 import { FeaturedProject } from "@/components/projects/featured-project";
 import { ProjectExplorer } from "@/components/projects/project-explorer";
 import { Transformation } from "@/components/sections/transformation";
 import { Container } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
-import { featuredProject, secondaryProjects } from "@/data/projects";
+import { getFeaturedProject, getSecondaryProjects } from "@/data/content";
+import { useContent } from "@/components/i18n/use-content";
 
 /**
  * Hierarquia da seção: cabeçalho em bege → faixa navy de largura total com o
@@ -11,14 +15,19 @@ import { featuredProject, secondaryProjects } from "@/data/projects";
  * lista com preview (não um grid de cards iguais).
  */
 export function FeaturedWork() {
+  const { locale } = useLanguage();
+  const { ui } = useContent();
+  const featuredProject = getFeaturedProject(locale);
+  const secondaryProjects = getSecondaryProjects(locale);
+
   return (
     <section id="projetos" className="border-t border-line bg-paper">
       <Container className="pb-14 pt-section md:pb-16">
         <SectionHeader
           index="01"
-          label="Projetos"
-          title="Problema, solução e o que foi construído."
-          lead="O sistema de gestão da PlatoTruck é o principal case. Os outros dois mostram a mesma atuação em contextos diferentes."
+          label={ui.projects.eyebrow}
+          title={ui.projects.pageTitle}
+          lead={ui.projects.pageLead}
         />
       </Container>
 

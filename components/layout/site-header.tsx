@@ -9,7 +9,7 @@ import { Menu, X } from "lucide-react";
 import { LanguageToggle } from "@/components/hero/language-toggle";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Container } from "@/components/ui/container";
-import { nav, site } from "@/data/site";
+import { useContent } from "@/components/i18n/use-content";
 import { cn } from "@/lib/utils";
 
 /** Altura do header — usada para recortar a faixa observada sobre a capa. */
@@ -27,6 +27,7 @@ const HEADER_HEIGHT = 56;
  * precisasse de um branco fixo por cima para não desaparecer).
  */
 export function SiteHeader() {
+  const { nav, site, ui } = useContent();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [coverVisible, setCoverVisible] = useState(false);
@@ -115,7 +116,7 @@ export function SiteHeader() {
           <Link
             href="/"
             onClick={handleHomeClick}
-            aria-label={`${site.name}, ir para a página inicial`}
+            aria-label={`${site.name}, ${ui.header.home}`}
             aria-current={pathname === "/" ? "page" : undefined}
             className={cn(
               "inline-flex min-h-11 max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap text-[clamp(0.72rem,0.64rem+0.28vw,0.9rem)] font-medium tracking-[-0.015em] text-foreground/80 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
@@ -129,7 +130,7 @@ export function SiteHeader() {
         {/* A coluna central tem largura própria entre duas colunas flexíveis
             iguais. Assim a navegação permanece no centro geométrico da
             viewport, independentemente da largura do nome e dos controles. */}
-        <nav aria-label="Navegação principal" className="hidden lg:block">
+        <nav aria-label={ui.header.nav} className="hidden lg:block">
           <ul className="flex items-center gap-8">
             {nav.map((item) => (
               <li key={item.href}>
@@ -161,7 +162,7 @@ export function SiteHeader() {
             onClick={() => setOpen((value) => !value)}
             aria-expanded={open}
             aria-controls="menu-mobile"
-            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-label={open ? ui.header.closeMenu : ui.header.openMenu}
             className={cn(
               "inline-flex size-11 items-center justify-center text-foreground transition-colors duration-200 hover:text-foreground/70 focus-visible:text-foreground lg:hidden",
               heroLegibility,
@@ -182,7 +183,7 @@ export function SiteHeader() {
         className="border-t border-border/60 bg-transparent lg:hidden"
       >
         <Container>
-          <nav aria-label="Navegação principal (mobile)" className="py-3">
+          <nav aria-label={ui.header.navMobile} className="py-3">
             <ul className="flex flex-col">
               {nav.map((item) => (
                 <li key={item.href} className="border-b border-border last:border-0">
@@ -201,7 +202,7 @@ export function SiteHeader() {
                   onClick={() => setOpen(false)}
                   className="inline-flex rounded-lg border border-border/70 bg-foreground/[0.05] px-4 py-2.5 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-foreground/[0.09]"
                 >
-                  Vamos conversar
+                  {ui.header.cta}
                 </Link>
               </li>
             </ul>

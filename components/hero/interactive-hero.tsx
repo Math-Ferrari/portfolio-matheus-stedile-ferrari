@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import { AboutIntro } from "@/components/hero/about-intro";
 import { ThemedFloatingLines } from "@/components/hero/themed-floating-lines";
-import { site } from "@/data/site";
+import { useContent } from "@/components/i18n/use-content";
 
 type InteractiveHeroProps = {
   /** Ver `ThemedFloatingLines`/`FloatingLines` — só repassado adiante. */
@@ -48,6 +48,7 @@ type InteractiveHeroProps = {
  * consecutivos: primeiro a capa, depois todo o conteúdo de `AboutIntro`.
  */
 export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseColorMorphRef }: InteractiveHeroProps) {
+  const { hero, site } = useContent();
   const [firstName, ...restName] = site.name.split(" ");
 
   return (
@@ -125,7 +126,7 @@ export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseC
             href="/#projetos"
             className="hero-rise hero-d5 group mt-9 inline-flex items-center gap-2 text-[0.95rem] font-semibold text-foreground transition-colors duration-200 hover:text-muted"
           >
-            Ver projetos
+            {hero.primaryCta.label}
             <ArrowRight
               aria-hidden
               className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-1"
@@ -135,7 +136,11 @@ export function InteractiveHero({ progressRef, linesFadeRef, linesExitRef, baseC
           </div>
         </div>
 
-        <div className="hero-profile-layer col-start-1 row-start-2 justify-self-stretch py-20 text-left sm:py-24 md:pointer-events-none md:col-start-1 md:row-start-1 md:justify-self-center md:py-0">
+        {/* `md:pt-16` é a folga da navbar fixa (58px de altura + 14px de
+            topo = 72px): a cena é centralizada em 100svh, então sem esse
+            respiro o topo da composição do perfil encosta — e, em telas
+            baixas, passa por baixo — da cápsula do header. */}
+        <div className="hero-profile-layer col-start-1 row-start-2 justify-self-stretch py-20 text-left sm:py-24 md:pointer-events-none md:col-start-1 md:row-start-1 md:justify-self-stretch md:py-0 md:pt-16">
           <AboutIntro />
         </div>
       </div>

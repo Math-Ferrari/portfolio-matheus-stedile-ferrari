@@ -1,3 +1,6 @@
+"use client";
+
+import { useContent } from "@/components/i18n/use-content";
 import { ImageLightboxProvider } from "@/components/projects/image-lightbox";
 import { ScreenshotGroup } from "@/components/projects/screenshot";
 import { CaseSection } from "@/components/projects/case/case-section";
@@ -22,6 +25,8 @@ function BlockBody({
   screenshotTone: Tone;
   lightboxIndices?: Array<number | null>;
 }) {
+  const { ui } = useContent();
+
   switch (block.kind) {
     case "prose":
       return (
@@ -175,7 +180,7 @@ function BlockBody({
       return (
         <div className="max-w-[62ch] rounded-md border border-dashed border-border bg-surface-elevated p-6">
           <p className="text-caption font-medium uppercase tracking-[0.2em] text-muted">
-            Seção em preparação
+            {ui.case.pending}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted">{block.note}</p>
         </div>

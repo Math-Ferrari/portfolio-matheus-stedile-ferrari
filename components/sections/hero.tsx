@@ -1,10 +1,13 @@
+"use client";
+
+import { useContent } from "@/components/i18n/use-content";
 import { FramedVisual } from "@/components/projects/framed-visual";
 import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
-import { hero, heroVisual } from "@/data/site";
 import { splitHighlight } from "@/lib/utils";
 
 export function Hero() {
+  const { hero, heroVisual } = useContent();
   const { before, match, after } = splitHighlight(hero.title, hero.highlight);
 
   return (

@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 
+import { useContent } from "@/components/i18n/use-content";
+
 import { useImageLightbox } from "@/components/projects/image-lightbox";
 import type { Tone } from "@/components/ui/tone";
 import type { Screenshot } from "@/lib/types";
@@ -68,6 +70,7 @@ export function ScreenshotFrame({
   className,
   aspectClassName,
 }: FrameProps) {
+  const { ui } = useContent();
   const frame = screenshot.frame ?? "desktop";
   const hasNaturalSize =
     Boolean(screenshot.src && screenshot.width && screenshot.height) && !aspectClassName;
@@ -118,7 +121,7 @@ export function ScreenshotFrame({
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
           <ImageIcon aria-hidden className="size-5 text-muted" strokeWidth={1.5} />
           <p className="text-caption font-medium uppercase tracking-[0.2em] text-muted">
-            Placeholder de desenvolvimento
+            {ui.media.placeholder}
           </p>
           <p className="max-w-[36ch] text-sm text-muted">{screenshot.alt}</p>
         </div>

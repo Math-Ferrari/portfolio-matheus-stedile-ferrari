@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 
+import { useContent } from "@/components/i18n/use-content";
 import { Container } from "@/components/ui/container";
-import { activeContacts, nav, site } from "@/data/site";
 
 export function SiteFooter() {
+  const { contacts, nav, site, ui } = useContent();
+  const activeContacts = contacts.filter((contact) => contact.href.length > 0);
   const year = new Date().getFullYear();
 
   return (
@@ -17,9 +21,9 @@ export function SiteFooter() {
             <p className="mt-4 text-sm text-foreground">{site.positioning}</p>
           </div>
 
-          <nav aria-label="Rodapé" className="lg:col-span-3">
+          <nav aria-label={ui.footer.label} className="lg:col-span-3">
             <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
-              Navegação
+              {ui.footer.navigation}
             </p>
             <ul className="mt-3 grid grid-cols-2 gap-x-6 sm:mt-4 lg:flex lg:flex-col lg:gap-1">
               {nav.map((item) => (
@@ -38,7 +42,7 @@ export function SiteFooter() {
           {activeContacts.length > 0 ? (
             <div className="lg:col-span-4">
               <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
-                Contato
+                {ui.footer.contact}
               </p>
               <ul className="mt-3 flex flex-col sm:mt-4">
                 {activeContacts.map((contact) => (

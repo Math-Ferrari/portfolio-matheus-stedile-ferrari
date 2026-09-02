@@ -1,14 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { useContent } from "@/components/i18n/use-content";
 import { ScreenshotFrame } from "@/components/projects/screenshot";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
-import { getProject, selectedProjects } from "@/data/projects";
+import type { Content } from "@/data/content";
 import type { Project } from "@/lib/types";
 import { cn, toIndexLabel } from "@/lib/utils";
 
-type Showcase = (typeof selectedProjects)[number];
+type Showcase = Content["selectedProjects"][number];
 
 /**
  * Card = módulo editorial horizontal, não card de dashboard em coluna. Um
@@ -40,12 +43,14 @@ function ProjectCard({
   showcase,
   project,
   index,
+  featuredLabel,
   principal = false,
   delay = 0,
 }: {
   showcase: Showcase;
   project: Project;
   index: number;
+  featuredLabel: string;
   principal?: boolean;
   delay?: number;
 }) {
@@ -71,7 +76,7 @@ function ProjectCard({
             </span>
             {principal ? (
               <span className="ml-auto shrink-0 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-accent">
-                Case principal
+                {featuredLabel}
               </span>
             ) : null}
           </div>
@@ -147,13 +152,15 @@ function ProjectCard({
  * exatamente a mesma caixa.
  */
 export function SelectedProjects() {
+  const { projects, selectedProjects, ui } = useContent();
+
   return (
     <section id="projetos" className="bg-tone-navy">
       <Container className="py-section">
         <Reveal>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4 border-b border-border pb-6 sm:gap-x-6 sm:pb-8">
             <h2 className="text-balance-title min-w-0 text-heading-xl font-medium text-foreground">
-              Projetos selecionados
+              {ui.sections.selectedProjects}
             </h2>
             <span
               aria-hidden
@@ -166,7 +173,7 @@ export function SelectedProjects() {
 
         <div className="mt-10 flex flex-col gap-6 sm:mt-12 md:gap-7 lg:gap-8">
           {selectedProjects.map((showcase, index) => {
-            const project = getProject(showcase.slug);
+            const project = projects.find((item) => item.slug === showcase.slug);
             if (!project) {
               return null;
             }
@@ -177,6 +184,7 @@ export function SelectedProjects() {
                 showcase={showcase}
                 project={project}
                 index={index}
+                featuredLabel={ui.sections.featuredCase}
                 principal={project.featured}
                 delay={index * 80}
               />

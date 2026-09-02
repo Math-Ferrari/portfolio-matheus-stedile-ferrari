@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useContent } from "@/components/i18n/use-content";
 import { FramedVisual } from "@/components/projects/framed-visual";
 import { ActionLink } from "@/components/ui/action-link";
 import { Container } from "@/components/ui/container";
@@ -20,6 +23,7 @@ type FeaturedProjectProps = {
  * como a mesma "cena" em qualquer página.
  */
 export function FeaturedProject({ project, as: Heading = "h3" }: FeaturedProjectProps) {
+  const { ui } = useContent();
   const href = `/projetos/${project.slug}`;
   const { before, match, after } = splitHighlight(
     project.tagline,
@@ -31,7 +35,7 @@ export function FeaturedProject({ project, as: Heading = "h3" }: FeaturedProject
       <Container className="py-16 md:py-20 lg:py-24">
         <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12 lg:items-center">
           <Reveal className="lg:col-span-5">
-            <Eyebrow>Case principal</Eyebrow>
+            <Eyebrow>{ui.sections.featuredCase}</Eyebrow>
 
             <Heading className="text-balance-title mt-7 text-heading-xl font-medium text-foreground">
               <Link href={href} className="transition-colors duration-200 hover:text-accent">
@@ -57,7 +61,7 @@ export function FeaturedProject({ project, as: Heading = "h3" }: FeaturedProject
 
             <div className="mt-10">
               <ActionLink href={href} variant="quiet" className="text-lg">
-                Ver case completo
+                {ui.projects.viewCase}
               </ActionLink>
             </div>
           </Reveal>

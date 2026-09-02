@@ -589,21 +589,6 @@
   }
 }
 
-/* Telas baixas (laptop com barra de endereço/favoritos comendo altura, ou
-   janela não-maximizada) — `#profile-title` some 4 linhas com `7.1vw`
-   (Construo / software para / operações / reais.) que cabem folgado em
-   ~900px de altura, mas encostam no header por volta de ~760px pra baixo.
-   `min(7.1vw, 8svh)` troca a escala por ALTURA só dentro deste breakpoint;
-   acima de 820px de altura este bloco nem existe, então o heading nas telas
-   comuns (a maioria) fica do tamanho original, sem cap nenhum. Calibrado e
-   testado até 664px de altura (ver auditoria da tarefa de recoloração da
-   seção de perfil) — folga de ~10px do header nesse extremo. */
-@media (min-width: 768px) and (max-height: 820px) {
-  #profile-title {
-    font-size: clamp(2.1rem, min(7.1vw, 8svh), 6.4rem);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   /* `HeroTransition` também não registra o listener do Lenis neste modo —
      isto é reforço visual/estrutural, não a única linha de defesa. */

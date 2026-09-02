@@ -15,6 +15,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { useContent } from "@/components/i18n/use-content";
 import type { Screenshot } from "@/lib/types";
 
 type LightboxContextValue = {
@@ -39,6 +40,7 @@ const focusableSelector = [
 ].join(",");
 
 export function ImageLightboxProvider({ images, children }: ImageLightboxProviderProps) {
+  const { ui } = useContent();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -165,7 +167,7 @@ export function ImageLightboxProvider({ images, children }: ImageLightboxProvide
                 ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
-                aria-label="Visualização ampliada de screenshots"
+                aria-label={ui.media.lightbox}
                 aria-describedby={active.caption ? captionId : undefined}
                 tabIndex={-1}
                 className="relative flex size-full cursor-zoom-out items-center justify-center outline-none"
@@ -184,7 +186,7 @@ export function ImageLightboxProvider({ images, children }: ImageLightboxProvide
                   ref={closeButtonRef}
                   type="button"
                   data-lightbox-content
-                  aria-label="Fechar visualização ampliada"
+                  aria-label={ui.media.lightboxClose}
                   onClick={close}
                   className="absolute right-2 top-2 z-10 inline-flex size-11 items-center justify-center rounded-full border border-white/15 bg-black/60 text-white transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-0 sm:top-0 sm:size-12"
                 >
@@ -194,7 +196,7 @@ export function ImageLightboxProvider({ images, children }: ImageLightboxProvide
                 <button
                   type="button"
                   data-lightbox-content
-                  aria-label="Screenshot anterior"
+                  aria-label={ui.media.lightboxPrev}
                   aria-disabled={activeIndex === 0}
                   onClick={previous}
                   className="absolute left-1 top-1/2 z-10 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/60 text-white transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-disabled:cursor-default aria-disabled:opacity-25 sm:left-2 sm:size-12"
@@ -235,7 +237,7 @@ export function ImageLightboxProvider({ images, children }: ImageLightboxProvide
                 <button
                   type="button"
                   data-lightbox-content
-                  aria-label="Próxima screenshot"
+                  aria-label={ui.media.lightboxNext}
                   aria-disabled={activeIndex === images.length - 1}
                   onClick={next}
                   className="absolute right-1 top-1/2 z-10 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/60 text-white transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-disabled:cursor-default aria-disabled:opacity-25 sm:right-2 sm:size-12"

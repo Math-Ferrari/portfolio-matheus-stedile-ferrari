@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+
+import { useContent } from "@/components/i18n/use-content";
 
 import { FramedVisual } from "@/components/projects/framed-visual";
 import { ActionLink } from "@/components/ui/action-link";
@@ -13,6 +17,7 @@ type CaseHeaderProps = {
 };
 
 export function CaseHeader({ project }: CaseHeaderProps) {
+  const { ui } = useContent();
   const { before, match, after } = splitHighlight(
     project.tagline,
     project.taglineHighlight ?? "",
@@ -30,7 +35,7 @@ export function CaseHeader({ project }: CaseHeaderProps) {
             className="size-4 transition-transform duration-200 ease-out group-hover:-translate-x-1"
             strokeWidth={1.75}
           />
-          Projetos
+          {ui.projects.eyebrow}
         </Link>
 
         <div className="mt-10 grid min-w-0 grid-cols-[minmax(0,1fr)] items-center gap-x-12 gap-y-12 lg:grid-cols-12">

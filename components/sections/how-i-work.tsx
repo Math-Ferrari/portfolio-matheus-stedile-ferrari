@@ -1,6 +1,8 @@
+"use client";
+
+import { useContent } from "@/components/i18n/use-content";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
-import { howIWork } from "@/data/site";
 
 /**
  * Fusão de "Abordagem" e "O que faço" — as duas diziam a mesma coisa por
@@ -9,6 +11,8 @@ import { howIWork } from "@/data/site";
  * por grid e tipografia: nenhum card, nenhuma numeração decorativa.
  */
 export function HowIWork() {
+  const { howIWork } = useContent();
+
   return (
     <section id="como-trabalho" className="bg-background">
       <Container className="py-section">
@@ -24,7 +28,7 @@ export function HowIWork() {
         {/* Como penso — três etapas, tipográficas, sem caixa. */}
         <Reveal delay={80} className="mt-14 sm:mt-16 lg:mt-20">
           <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
-            Como penso
+            {howIWork.thinkingLabel}
           </p>
           <ol className="mt-8 grid gap-x-12 gap-y-10 sm:grid-cols-3">
             {howIWork.thinking.map((step) => (
@@ -41,7 +45,7 @@ export function HowIWork() {
         {/* O que construo — quatro frentes, uma linha cada. */}
         <Reveal delay={80} className="mt-14 sm:mt-16 lg:mt-20">
           <p className="text-caption font-medium uppercase tracking-[0.18em] text-muted">
-            O que construo
+            {howIWork.buildingLabel}
           </p>
           <dl className="mt-8 border-t border-border">
             {howIWork.building.map((item) => (

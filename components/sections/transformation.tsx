@@ -1,7 +1,11 @@
+"use client";
+
+import { useContent } from "@/components/i18n/use-content";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal } from "@/components/ui/reveal";
-import { featuredProject, getFeaturedBeforeAfter } from "@/data/projects";
+import { getFeaturedBeforeAfter, getFeaturedProject } from "@/data/content";
+import { useLanguage } from "@/components/i18n/language-provider";
 
 /**
  * Versão-teaser do antes/depois do case principal, lida direto do bloco
@@ -9,7 +13,10 @@ import { featuredProject, getFeaturedBeforeAfter } from "@/data/projects";
  * tipográfico — sem caixas, sem ícones, sem aparência de infográfico.
  */
 export function Transformation() {
-  const block = getFeaturedBeforeAfter();
+  const { locale } = useLanguage();
+  const { ui } = useContent();
+  const featuredProject = getFeaturedProject(locale);
+  const block = getFeaturedBeforeAfter(locale);
 
   if (!block) {
     return null;
@@ -21,7 +28,9 @@ export function Transformation() {
   return (
     <div className="border-t border-border bg-background">
       <Container className="py-16 md:py-20">
-        <Eyebrow>{featuredProject.name} — a transformação</Eyebrow>
+        <Eyebrow>
+          {featuredProject.name} {ui.transformation.suffix}
+        </Eyebrow>
 
         <div className="mt-10 grid gap-10 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-10">
           <Reveal>

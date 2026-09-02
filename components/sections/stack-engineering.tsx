@@ -1,6 +1,8 @@
+"use client";
+
+import { useContent } from "@/components/i18n/use-content";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
-import { engineering, techGroups } from "@/data/site";
 
 /**
  * Stack + Engenharia numa composição dividida — antes eram duas seções
@@ -12,6 +14,7 @@ import { engineering, techGroups } from "@/data/site";
  * cromático raro da seção — um só, no fecho da lista.
  */
 export function StackEngineering() {
+  const { engineering, techGroups } = useContent();
   const lastIndex = engineering.principles.length - 1;
 
   return (
@@ -20,7 +23,7 @@ export function StackEngineering() {
         <div className="grid gap-x-16 gap-y-20 lg:grid-cols-12">
           {/* Stack */}
           <Reveal className="lg:col-span-7">
-            <h2 className="text-heading-xl font-medium text-foreground">Stack</h2>
+            <h2 className="text-heading-xl font-medium text-foreground">{engineering.stackHeading}</h2>
 
             <dl className="mt-10 border-t border-border">
               {techGroups.map((group) => (
@@ -39,7 +42,7 @@ export function StackEngineering() {
 
           {/* Engenharia — princípios, sem um parágrafo por item. */}
           <Reveal delay={80} className="lg:col-span-5 lg:border-l lg:border-border lg:pl-12">
-            <h2 className="text-heading-xl font-medium text-foreground">Engenharia</h2>
+            <h2 className="text-heading-xl font-medium text-foreground">{engineering.heading}</h2>
 
             <p className="mt-6 max-w-[40ch] text-muted">{engineering.title}</p>
             <p className="mt-4 max-w-[40ch] text-sm text-muted">{engineering.lead}</p>
