@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLenis } from "lenis/react";
 import { Menu, X } from "lucide-react";
@@ -9,7 +8,9 @@ import { Menu, X } from "lucide-react";
 import { LanguageToggle } from "@/components/hero/language-toggle";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Container } from "@/components/ui/container";
+import { Link } from "@/components/i18n/locale-link";
 import { useContent } from "@/components/i18n/use-content";
+import { useLanguage } from "@/components/i18n/language-provider";
 import { cn } from "@/lib/utils";
 
 /** Altura do header — usada para recortar a faixa observada sobre a capa. */
@@ -28,14 +29,18 @@ const HEADER_HEIGHT = 56;
  */
 export function SiteHeader() {
   const { nav, site, ui } = useContent();
+  const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [coverVisible, setCoverVisible] = useState(false);
   const pathname = usePathname();
   const lenis = useLenis();
 
+  /** A home agora é `/pt` ou `/en`, conforme o idioma ativo. */
+  const homeHref = `/${locale}`;
+
   /** A capa só existe na home; este estado serve apenas ao reforço de contraste. */
-  const hasCover = pathname === "/";
+  const hasCover = pathname === homeHref;
 
   /**
    * Já na home, `href="/"` não dispara navegação (mesma URL) — sem isto o
@@ -43,7 +48,7 @@ export function SiteHeader() {
    * ele já entra no topo da página seguinte.
    */
   const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (pathname !== "/") {
+    if (pathname !== homeHref) {
       return;
     }
     event.preventDefault();
@@ -117,7 +122,7 @@ export function SiteHeader() {
             href="/"
             onClick={handleHomeClick}
             aria-label={`${site.name}, ${ui.header.home}`}
-            aria-current={pathname === "/" ? "page" : undefined}
+            aria-current={pathname === homeHref ? "page" : undefined}
             className={cn(
               "inline-flex min-h-11 max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap text-[clamp(0.72rem,0.64rem+0.28vw,0.9rem)] font-medium tracking-[-0.015em] text-foreground/80 transition-colors duration-200 hover:text-foreground focus-visible:text-foreground",
               heroLegibility,

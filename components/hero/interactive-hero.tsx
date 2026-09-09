@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { AboutIntro } from "@/components/hero/about-intro";
 import { ThemedFloatingLines } from "@/components/hero/themed-floating-lines";
+import { Link } from "@/components/i18n/locale-link";
 import { useContent } from "@/components/i18n/use-content";
 
 type InteractiveHeroProps = {

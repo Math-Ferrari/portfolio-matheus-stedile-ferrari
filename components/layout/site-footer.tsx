@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-
+import { Link } from "@/components/i18n/locale-link";
 import { useContent } from "@/components/i18n/use-content";
 import { Container } from "@/components/ui/container";
 

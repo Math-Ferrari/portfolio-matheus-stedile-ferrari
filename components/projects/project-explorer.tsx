@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { Link } from "@/components/i18n/locale-link";
 import { ScreenshotFrame } from "@/components/projects/screenshot";
 import type { Project } from "@/lib/types";
 import { cn, toIndexLabel } from "@/lib/utils";

@@ -4,7 +4,7 @@ import { useContent } from "@/components/i18n/use-content";
 
 /**
  * Atalho de teclado para pular a navegação. Virou componente próprio só
- * porque o texto precisa acompanhar o idioma, e `app/layout.tsx` é um Server
+ * porque o texto precisa acompanhar o idioma, e `app/[locale]/layout.tsx` é um Server
  * Component — as classes e o comportamento são exatamente os de antes.
  */
 export function SkipLink() {

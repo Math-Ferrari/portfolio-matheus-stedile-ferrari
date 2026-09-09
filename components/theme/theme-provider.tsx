@@ -5,13 +5,19 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useSyncExternalStore,
 } from "react";
 
-export type Theme = "light" | "dark";
-
-const STORAGE_KEY = "theme";
+import {
+  persistTheme,
+  readStoredTheme,
+  readThemeAttribute,
+  resolveTheme,
+  writeThemeAttribute,
+  type Theme,
+} from "@/lib/theme";
 
 type ThemeContextValue = {
   theme: Theme;
@@ -22,15 +28,25 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 /**
- * `data-theme` em `<html>` é a fonte de verdade — não um estado React
- * duplicado. `useSyncExternalStore` é o jeito correto de ler esse valor
- * externo sem divergir do HTML do servidor: no servidor e no primeiro render
- * do cliente usa `getServerSnapshot` ("dark", fixo); só depois de hidratado
- * passa a ler o atributo real via `getSnapshot`. Isso evita o erro de
- * hidratação sem depender de um `setState` dentro de efeito (a cor que a
- * pessoa vê nunca dependeu deste estado — só o `data-theme` grava a cor real,
- * via script inline em `app/layout.tsx`; este hook só mantém o React ciente
- * do valor atual, ex.: para o ícone do `ThemeToggle`).
+ * `data-theme` em `<html>` continua sendo a fonte de verdade visual — não um
+ * estado React duplicado. `useSyncExternalStore` é o jeito correto de ler esse
+ * valor externo sem divergir do HTML do servidor: no servidor e no render de
+ * hidratação usa `getServerSnapshot` ("dark", o mesmo que `:root` pinta sem
+ * JavaScript); depois de hidratado passa a ler o valor real.
+ *
+ * ── Por que o fallback em `getSnapshot` ────────────────────────────────────
+ * O atributo pode DESAPARECER por um instante, e isso não é hipotético: o
+ * layout raiz do site vive dentro do segmento `[locale]`
+ * (`app/[locale]/layout.tsx`), e o App Router renderiza cada segmento com uma
+ * `key` derivada do VALOR do parâmetro. Trocar `/pt` por `/en` muda essa key,
+ * então o React desmonta a raiz e monta outra — e ao re-adquirir os host
+ * singletons `<html>`/`<body>` ele apaga todo atributo que não veio do JSX,
+ * `data-theme` incluído.
+ *
+ * Ler o atributo cru nesse instante devolveria "dark" (o valor que `:root`
+ * representa) mesmo para quem está no claro. Por isso, quando o atributo não
+ * está lá, caímos para `resolveTheme()` — a mesma ordem do script inline
+ * (escolha salva → preferência do sistema), em `lib/theme.ts`.
  */
 const listeners = new Set<() => void>();
 
@@ -44,39 +60,38 @@ function notify() {
 }
 
 function getSnapshot(): Theme {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+  return readThemeAttribute() ?? resolveTheme();
 }
 
 function getServerSnapshot(): Theme {
   return "dark";
 }
 
+/** `useLayoutEffect` no cliente (precisa rodar ANTES do paint) e `useEffect` no SSR. */
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 /**
  * Fonte de verdade do tema no lado do cliente.
  *
- * O flash é evitado pelo script inline em `app/layout.tsx`, que roda antes de
- * qualquer JavaScript do React e já deixa `data-theme` correto em `<html>` no
- * primeiro paint. Toda troca grava no `<html>` E no `localStorage` ao mesmo
- * tempo, então um refresh ou uma aba nova sempre encontram a escolha certa já
- * persistida. Enquanto não houver escolha manual (`localStorage` vazio),
- * acompanha mudanças ao vivo em `prefers-color-scheme` — assim que o usuário
- * escolhe uma vez, essa escuta para de importar.
+ * O flash no primeiro carregamento é evitado pelo script inline
+ * (`THEME_INIT_SCRIPT`), que roda antes de qualquer JavaScript do React. Toda
+ * troca grava no `<html>` E no `localStorage` ao mesmo tempo, então um refresh
+ * ou uma aba nova sempre encontram a escolha certa já persistida. Enquanto não
+ * houver escolha manual (`localStorage` vazio), acompanha mudanças ao vivo em
+ * `prefers-color-scheme` — assim que o usuário escolhe uma vez, essa escuta
+ * para de importar.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const applyTheme = useCallback((next: Theme) => {
-    document.documentElement.dataset.theme = next;
+    writeThemeAttribute(next);
     notify();
   }, []);
 
   const setTheme = useCallback(
     (next: Theme) => {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-        // Modo privado ou storage bloqueado: a escolha só vale pela sessão.
-      }
+      persistTheme(next);
       applyTheme(next);
     },
     [applyTheme],
@@ -86,14 +101,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(theme === "dark" ? "light" : "dark");
   }, [theme, setTheme]);
 
-  useEffect(() => {
-    let hasManualChoice = false;
-    try {
-      hasManualChoice = window.localStorage.getItem(STORAGE_KEY) !== null;
-    } catch {
-      hasManualChoice = false;
+  /**
+   * Reafirma o atributo sempre que este provider monta — e ele monta de novo a
+   * cada troca de idioma, junto com a raiz (ver o comentário sobre a `key` do
+   * segmento, acima). É o que devolve `data-theme` ao `<html>` depois de o
+   * React tê-lo apagado ao re-adquirir o singleton.
+   *
+   * Duas garantias importantes:
+   *
+   *   - É um LAYOUT effect: roda no mesmo commit que apagou o atributo, antes
+   *     do browser pintar. O visitante nunca vê o site piscar em dark.
+   *   - Só escreve quando o atributo está AUSENTE. Não usa `theme` (o valor do
+   *     React) porque no render de hidratação ele ainda é `getServerSnapshot()`
+   *     ("dark"); escrever esse valor por cima apagaria a escolha real de quem
+   *     está no claro. Um atributo já presente é sempre respeitado.
+   */
+  useIsomorphicLayoutEffect(() => {
+    if (readThemeAttribute() !== null) {
+      return;
     }
-    if (hasManualChoice) {
+    writeThemeAttribute(resolveTheme());
+    notify();
+  }, []);
+
+  useEffect(() => {
+    if (readStoredTheme() !== null) {
       return;
     }
 

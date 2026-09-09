@@ -1,16 +1,22 @@
 import { ImageResponse } from "next/og";
 
-import { defaultContent } from "@/data/content";
+import { defaultContent, getContent } from "@/data/content";
+import { toLocale } from "@/lib/i18n";
 import { splitHighlight } from "@/lib/utils";
-
-const { hero, site } = defaultContent;
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = site.title;
+/** Nome próprio: idêntico nos dois idiomas, então não precisa variar por locale. */
+export const alt = defaultContent.site.name;
 
-/** Imagem de Open Graph gerada a partir do conteúdo do site — sem assets externos. */
-export default function OpengraphImage() {
+type ImageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+/** Imagem de Open Graph gerada a partir do conteúdo do site, no idioma da rota — sem assets externos. */
+export default async function OpengraphImage({ params }: ImageProps) {
+  const locale = toLocale((await params).locale);
+  const { hero, site } = getContent(locale);
   const { before, match, after } = splitHighlight(hero.title, hero.highlight);
 
   return new ImageResponse(

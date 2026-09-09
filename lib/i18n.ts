@@ -29,6 +29,18 @@ export const HTML_LANG: Record<Locale, string> = {
   en: "en",
 };
 
+/** Chave de `alternates.languages` (hreflang) para cada idioma. */
+export const HREFLANG: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en",
+};
+
+/** Valor de `openGraph.locale` (formato `pt_BR`) para cada idioma. */
+export const OG_LOCALE: Record<Locale, string> = {
+  pt: "pt_BR",
+  en: "en_US",
+};
+
 /** Um valor que existe nos dois idiomas. `L<string>` é o caso comum. */
 export type L<T = string> = { readonly pt: T; readonly en: T };
 
@@ -78,7 +90,72 @@ export function localize<T>(node: T, locale: Locale): Localized<T> {
   return node as Localized<T>;
 }
 
-/** Normaliza qualquer entrada (localStorage, atributo do DOM) para um `Locale`. */
+/** Normaliza qualquer entrada (ex.: `params.locale` de uma rota) para um `Locale`. */
 export function toLocale(value: unknown): Locale {
   return value === "en" ? "en" : "pt";
+}
+
+/** `true` quando o valor é um dos segmentos de idioma válidos na URL. */
+export function isLocale(value: string): value is Locale {
+  return (LOCALES as readonly string[]).includes(value);
+}
+
+/**
+ * ────────────────────────────────────────────────────────────────────────────
+ * O idioma agora é o primeiro segmento da URL (`/pt/...`, `/en/...`), não mais
+ * um valor em `localStorage`. As duas funções abaixo são o único lugar que
+ * conhece esse formato — nenhum componente monta ou lê o prefixo à mão.
+ * ────────────────────────────────────────────────────────────────────────────
+ */
+
+/**
+ * Prefixa um href interno (sempre começando por `/`, na forma escrita nos
+ * arquivos de `data/`, ex.: `/`, `/#projetos`, `/projetos/${slug}`) com o
+ * idioma ativo. Preserva um fragmento (`#...`) depois do prefixo, para que
+ * `/#projetos` vire `/pt#projetos` e não `/pt/#projetos`.
+ *
+ * Hrefs externos (`http…`, `mailto:`, `tel:`) e protocol-relative (`//…`)
+ * passam intactos: só o que é navegação DENTRO do site ganha prefixo.
+ */
+export function withLocale(href: string, locale: Locale): string {
+  if (!href.startsWith("/") || href.startsWith("//")) {
+    return href;
+  }
+  const hashIndex = href.indexOf("#");
+  const path = hashIndex === -1 ? href : href.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : href.slice(hashIndex);
+  const localizedPath = path === "/" ? `/${locale}` : `/${locale}${path}`;
+  return `${localizedPath}${hash}`;
+}
+
+/**
+ * Troca o primeiro segmento de um pathname já resolvido (`usePathname()`,
+ * sempre `/pt/...` ou `/en/...`) pelo outro idioma, mantendo o resto da
+ * rota — é o que faz o `LanguageToggle` ir para a MESMA página no outro
+ * idioma em vez de voltar para a home.
+ */
+export function replaceLocaleInPath(pathname: string, locale: Locale): string {
+  const segments = pathname.split("/");
+  segments[1] = locale;
+  return segments.join("/") || `/${locale}`;
+}
+
+/**
+ * Monta o `alternates` de uma página (canonical + hreflang pt-BR/en/x-default)
+ * a partir do seu caminho SEM idioma — a mesma forma que `withLocale()`
+ * espera (`/`, `/projetos`, `/projetos/${slug}`). Usado nos três
+ * `generateMetadata` do site (home, lista de projetos, case) para não repetir
+ * o mapeamento de hreflang em cada um.
+ */
+export function localizedAlternates(
+  path: string,
+  locale: Locale,
+): { canonical: string; languages: Record<string, string> } {
+  const languages: Record<string, string> = {
+    "x-default": withLocale(path, DEFAULT_LOCALE),
+  };
+  for (const candidate of LOCALES) {
+    languages[HREFLANG[candidate]] = withLocale(path, candidate);
+  }
+  return { canonical: withLocale(path, locale), languages };
 }

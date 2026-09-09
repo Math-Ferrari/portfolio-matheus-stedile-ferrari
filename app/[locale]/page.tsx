@@ -1,8 +1,41 @@
+import type { Metadata } from "next";
+
 import { HeroTransition } from "@/components/hero/hero-transition";
 import { SelectedProjects } from "@/components/sections/selected-projects";
 import { HowIWork } from "@/components/sections/how-i-work";
 import { StackEngineering } from "@/components/sections/stack-engineering";
 import { Contact } from "@/components/sections/contact";
+import { getContent } from "@/data/content";
+import { OG_LOCALE, localizedAlternates, toLocale } from "@/lib/i18n";
+
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const locale = toLocale((await params).locale);
+  const { site } = getContent(locale);
+  const { canonical, languages } = localizedAlternates("/", locale);
+
+  return {
+    title: site.title,
+    description: site.description,
+    alternates: { canonical, languages },
+    openGraph: {
+      type: "website",
+      locale: OG_LOCALE[locale],
+      url: canonical,
+      siteName: site.name,
+      title: site.title,
+      description: site.description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: site.title,
+      description: site.description,
+    },
+  };
+}
 
 /**
  * Home — cinco blocos, cada argumento dito uma vez só.

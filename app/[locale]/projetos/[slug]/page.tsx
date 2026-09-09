@@ -4,37 +4,41 @@ import { notFound } from "next/navigation";
 import { CaseView } from "@/components/projects/case/case-view";
 import { getProject } from "@/data/content";
 import { projectSlugs } from "@/data/projects";
-import { DEFAULT_LOCALE } from "@/lib/i18n";
+import { OG_LOCALE, localizedAlternates, toLocale } from "@/lib/i18n";
 
 type PageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
+/**
+ * Só os slugs — o Next cruza automaticamente com os `locale` que
+ * `app/[locale]/layout.tsx` já declara, gerando as 2×3 combinações estáticas.
+ */
 export function generateStaticParams() {
   return projectSlugs.map((slug) => ({ slug }));
 }
 
-/**
- * Metadata em português — o idioma do visitante vive no `localStorage` e não
- * chega ao servidor. Ver a nota em `app/layout.tsx`.
- */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const project = getProject(slug, DEFAULT_LOCALE);
+  const { locale: rawLocale, slug } = await params;
+  const locale = toLocale(rawLocale);
+  const project = getProject(slug, locale);
 
   if (!project) {
     return {};
   }
 
+  const { canonical, languages } = localizedAlternates(`/projetos/${project.slug}`, locale);
+
   return {
     title: project.name,
     description: project.summary,
-    alternates: { canonical: `/projetos/${project.slug}` },
+    alternates: { canonical, languages },
     openGraph: {
       type: "article",
+      locale: OG_LOCALE[locale],
       title: `${project.name} — ${project.kind}`,
       description: project.summary,
-      url: `/projetos/${project.slug}`,
+      url: canonical,
     },
   };
 }

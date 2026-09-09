@@ -60,14 +60,14 @@ export const site = {
     pt: "Desenvolvo sistemas internos, aplicações web e integrações para organizar operações, reduzir trabalho manual e deixar a informação acessível para quem decide.",
     en: "I build internal systems, web applications, and integrations that organise operations, cut manual work, and put information within reach of the people who decide.",
   },
-  /** Locale do Open Graph. A metadata é servida sempre em PT — ver `app/layout.tsx`. */
-  locale: "pt-BR",
   /**
    * Domínio final do site. Defina NEXT_PUBLIC_SITE_URL no ambiente (ex.: Vercel)
    * quando o domínio existir — sitemap, robots e Open Graph usam este valor.
    */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  // A imagem de Open Graph é gerada em app/opengraph-image.tsx.
+  // A imagem de Open Graph é gerada em app/[locale]/opengraph-image.tsx.
+  // O locale do Open Graph (`pt_BR`/`en_US`) vem de `OG_LOCALE` em lib/i18n.ts,
+  // resolvido por rota — não é mais um valor fixo aqui.
   location: { pt: "Brasil", en: "Brazil" },
 };
 

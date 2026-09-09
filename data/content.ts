@@ -66,9 +66,11 @@ export function getContent(locale: Locale): Content {
 }
 
 /**
- * Conteúdo em português, para o que roda no servidor e não tem acesso à
- * escolha do visitante: `metadata`, JSON-LD, sitemap e a imagem de Open
- * Graph. Ver a nota sobre metadata em `app/layout.tsx`.
+ * Conteúdo em português, para o pouco que roda fora do segmento `[locale]`
+ * (`app/sitemap.ts`, `app/robots.ts`) e para valores que não variam por
+ * idioma (`site.url`, `site.name` no `alt` de `app/[locale]/opengraph-image.tsx`).
+ * Toda página e metadata DENTRO de `app/[locale]/` usa `getContent(locale)`
+ * com o locale da própria rota — não este valor fixo.
  */
 export const defaultContent = getContent(DEFAULT_LOCALE);
 

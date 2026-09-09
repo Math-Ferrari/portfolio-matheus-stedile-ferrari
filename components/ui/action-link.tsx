@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
+import { Link } from "@/components/i18n/locale-link";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "quiet" | "accentOutline" | "primaryDark" | "secondaryDark";

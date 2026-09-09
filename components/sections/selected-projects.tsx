@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { Link } from "@/components/i18n/locale-link";
 import { useContent } from "@/components/i18n/use-content";
 import { ScreenshotFrame } from "@/components/projects/screenshot";
 import { Container } from "@/components/ui/container";

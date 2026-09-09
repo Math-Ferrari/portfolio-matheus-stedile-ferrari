@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { Link } from "@/components/i18n/locale-link";
 import { useContent } from "@/components/i18n/use-content";
 
 import { FramedVisual } from "@/components/projects/framed-visual";
